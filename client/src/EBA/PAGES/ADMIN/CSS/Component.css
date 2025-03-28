@@ -1,0 +1,463 @@
+.dashboard.main-content {
+    background: none;
+}
+.dashboard {
+	width: 100%;
+	padding: 5px;
+	
+	.top {
+		display: flex;
+		gap: 20px;
+		flex-wrap: wrap;
+		
+		.card {
+			width: 200px;
+			height: 100px;
+			padding: 10px;
+			background: var(--bg-color);
+			border-radius: 10px;
+			display: flex;
+			justify-content: space-around;
+			flex-direction: column;
+			flex-grow: 1;
+
+			p {
+				font-size: 0.9rem;
+			}
+		}
+	}
+
+	.graph {
+		display: flex;
+		justify-content: space-between;
+		gap: 20px;
+		flex-wrap: wrap;
+		
+		.card {
+			width: 400px;
+			max-height: 400px;
+            min-height: 400px;
+            height: 100%;
+			padding: 10px;
+			background: var(--bg-color);
+			border-radius: 10px;
+			flex-grow: 1;
+			overflow-y: auto;
+
+			h2 {
+				padding-bottom: 5px;
+				border-bottom: 1px solid #acacac;
+			}
+		}
+		
+		.orders {
+			max-width: 50%;
+			width: 100%;
+		}
+	}
+
+	.graphs {
+		flex-wrap: nowrap;
+
+        td {
+            height: auto;
+        }
+	}
+
+	.pending-block {
+		width: 100%;
+		padding: 10px 0;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		overflow: auto;
+
+		.pending {
+			width: 100%;
+			padding: 10px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 10px;
+			border: 1px solid var(--txt-color);
+		}
+	}
+}
+
+.transaction {
+	.top {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 10px;
+
+		.top-block {
+			display: flex;
+            align-items: center;
+			gap: 30px;
+            position: relative;
+
+			.filter {
+				cursor: pointer;
+			}
+
+            .filter-dropdown {
+                width: 200px;
+                background: var(--bg-color);
+                padding: 10px;
+                box-shadow: 0 0 5px #acacac;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                position: absolute;
+                top: 130%;
+                right: 0;
+                z-index: 9;
+
+                button {
+                    width: 100%;
+                    padding: 5px;
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                }
+            }
+		}
+
+		p {
+			width: auto;
+			border-radius: 10px;
+			color: white;
+			border: none;
+			cursor: pointer;
+			padding: 10px;
+			background: #FF9000;
+		}
+	}
+
+	table {
+		button {
+			--btn-bg1: #FF9000;
+			--btn-bg2: #4E91F6;
+			--btn-bg3: red;
+		}
+	}
+
+    .order {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+        gap: 30px;
+        
+        .detail-block {
+            width: 100%;
+            height: 100px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            img {
+                height: 100%;
+                object-fit: contain;
+                display: flex;
+                justify-content: start;
+            }
+            
+            .img-block{
+                width: 50%;
+                height: 100%;
+            }
+
+            p {
+                width: 50%;
+                text-align: left;
+            }
+        }
+
+        .detail-btn {
+            height: auto;
+            justify-content: center;
+            gap: 30px;
+
+            button {
+                width: 40%;
+                padding: 10px;
+                background: var(--btn-bg);
+                border-radius: 5px;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+            button:nth-child(1) {
+                --btn-bg: #4E91F6;
+            }
+            button:nth-child(2) {
+                --btn-bg: red;
+            }
+        }
+    }
+}
+
+.announcement {
+	.date {
+		width: 100%;
+		height: 50vh;
+	}
+
+	.top {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		position: relative;
+
+		button {
+			padding: 10px 15px;
+			background: #FF9000;
+			border: none;
+			border-radius: 15px;
+			color: white;
+			font-size: 1rem;
+			position: absolute;
+			top: 50%;
+			right: 0;
+			transform: translateY(-50%);
+			cursor: pointer;
+		}
+	}
+
+	.lists {
+		width: 100%;
+		padding: 20px 0;
+		display: flex;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 20px;
+
+		.card {
+			min-width: 500px;
+			width: 100%;
+			max-width: 49%;
+			height: 200px;
+            border: 1px solid var(--txt-color);
+			padding: 10px;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			position: relative;
+
+			.card-btn {
+				padding: 5px 0;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+
+				.btn-block {
+					display: flex;
+					gap: 10px;
+
+					button {
+						font-size: 1rem;
+						color: var(--txt-color);
+						border: none;
+						background: none;
+						cursor: pointer;
+					}
+				}
+			}
+		}
+	}
+}
+
+.inventory {
+	.top {
+		display: flex;
+		gap: 10px;
+
+		select, button {
+			padding: 10px;
+			border-radius: 10px;
+			cursor: pointer;
+		}
+
+		select, option {
+			max-width: 200px;
+			background: none;
+			border: 1px solid var(--txt-color);
+			color: var(--txt-color);
+			background: var(--bg-color);
+		}
+
+		button {
+			background: #FF9000;
+			color: white;
+			border: none;
+		}
+	}
+
+	table {
+		button {
+			--btn-bg1: #4E91F6;
+			--btn-bg2: red;
+		}
+	}
+}
+
+
+
+
+
+
+
+.add-new-admin {
+	.top {
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+        align-items: center;
+
+		button {
+			padding: 10px 15px;
+			background: #FF9000;
+			border: none;
+			border-radius: 15px;
+			color: white;
+			font-size: 1rem;
+			cursor: pointer;
+		}
+	}
+
+	table {
+		button {
+			--btn-bg1: #4E91F6;
+			--btn-bg2: red;
+		}
+	}
+}
+
+.design {
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0 !important;
+
+    .sidebar {
+        max-width: 80px;
+        width: 7%;
+        background: var(--bg-color);
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+
+        button {
+            width: 100%;
+            border: none;
+            background: none;
+
+            img {
+                width: 100%;
+                object-fit: contain;
+            }
+        }
+    }
+
+    .technical-sketch {
+        border-right: 1px solid var(--txt-color);
+    }
+
+    .panel {
+        max-width: 47%;
+        width: 100%;
+        padding: 10px;
+        flex-grow: 1;
+
+        .top {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1rem;
+        }
+
+        img {
+            width: 100px;
+        }
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .dashboard {
+        .top {
+            .card {
+                max-width: 49%;
+                width: 100%;
+            }
+        }
+        .graphs {
+            flex-wrap: wrap;
+
+            .orders {
+                max-width: 100%;
+            }
+
+            .orders-card {
+                max-width: 50%;
+                width: 100%;
+                flex-grow: 1;
+            }
+        }
+    }
+
+    .transaction {
+        .top {
+            flex-direction: column-reverse;
+            align-items: start;
+            gap: 20px;
+        }
+    }
+
+    .announcement {
+        .top {
+            justify-content: space-between;
+            align-items: center;
+
+            button {
+                position: static;
+                transform: none;
+            }
+        }
+    }
+
+    .inventory {
+        .add-inventory {
+            form {
+                .form {
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+    .add-new-admin {
+        form {
+            .input-block {
+                width: 100%;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 450px) {
+.dashboard {
+    .top {
+        .card {
+            max-width: 100%;
+        }
+    }
+    .graph {
+        .orders {
+            width: 100%;
+        }
+    }
+}
+}
