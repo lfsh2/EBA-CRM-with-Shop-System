@@ -3,6 +3,8 @@ import axios from 'axios';
 
 import Dates from './Date'
 import '../CSS/Admin.css'
+import SalesChart from './SalesChart';
+import OrderChart from './OrderChart';
 
 const Dashboard = () => {
 	const [transactions, setTransactions] = useState([]);
@@ -90,10 +92,12 @@ const Dashboard = () => {
 				<div className="graph">
 					<div className="card">
 						<h2>Sales</h2>
+						<SalesChart />
 					</div>
 					
 					<div className="card">
 						<h2>Total Order</h2>
+						<OrderChart />
 					</div>
 				</div>
 				

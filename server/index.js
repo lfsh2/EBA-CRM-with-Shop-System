@@ -47,6 +47,79 @@ const upload = multer({
 
 
 
+apapp.get("/api/sales-data", (req, res) => {
+	const query = `
+	  SELECT 
+		DATE_FORMAT(created_at, '%M') AS month, 
+		category, 
+		SUM(quantity) AS total_sales 
+	  FROM transaction 
+	  GROUP BY month, category 
+	  ORDER BY MONTH(created_at);
+	`;
+  
+	db.query(query, (err, results) => {
+	  if (err) {
+		return res.status(500).json({ error: err.message });
+	  }
+  
+	  const formattedData = {
+		labels: [...new Set(results.map((row) => row.month))], 
+		datasets: [],
+	  };
+  
+	  const categories = [...new Set(results.map((row) => row.category))];
+  
+	  categories.forEach((category) => {
+		formattedData.datasets.push({
+		  label: category,
+		  data: results
+			.filter((row) => row.category === category)
+			.map((row) => row.total_sales),
+		});
+	  });
+  
+	  res.json(formattedData);
+	});
+  });
+  
+  app.get("/api/orders-data", (req, res) => {
+	const query = `
+	  SELECT 
+		DATE_FORMAT(created_at, '%M') AS month, 
+		category, 
+		COUNT(*) AS total_orders 
+	  FROM transaction 
+	  GROUP BY month, category 
+	  ORDER BY MONTH(created_at);
+	`;
+  
+	db.query(query, (err, results) => {
+	  if (err) {
+		return res.status(500).json({ error: err.message });
+	  }
+  
+	  const formattedData = {
+		labels: [...new Set(results.map((row) => row.month))], // Unique months
+		datasets: [],
+	  };
+  
+	  const categories = [...new Set(results.map((row) => row.category))];
+  
+	  categories.forEach((category) => {
+		formattedData.datasets.push({
+		  label: category,
+		  data: results
+			.filter((row) => row.category === category)
+			.map((row) => row.total_orders),
+		});
+	  });
+  
+	  res.json(formattedData);
+	});
+  });
+
+
 // BULLETIN PAGE
 // DISPLAY EVENT AND ANNOUNCEMENT
 app.get("/bulletin", (req, res) => {
