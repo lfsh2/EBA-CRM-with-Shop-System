@@ -11,7 +11,7 @@ const salt = 10;
 const port = 3000;
 const app = express();
 
-app.use(express.json());
+app.use(express.json());	
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
@@ -46,79 +46,190 @@ const upload = multer({
 })
 
 
-
-apapp.get("/api/sales-data", (req, res) => {
+app.get("/api/sales-data", (req, res) => {
 	const query = `
-	  SELECT 
-		DATE_FORMAT(created_at, '%M') AS month, 
-		category, 
-		SUM(quantity) AS total_sales 
-	  FROM transaction 
-	  GROUP BY month, category 
-	  ORDER BY MONTH(created_at);
+		SELECT 
+			DATE_FORMAT(Date, '%M') AS month, 
+			Item_Name as category, 
+			SUM(Amount) AS total_sales 
+		FROM transaction 
+		GROUP BY month, Item_Name 
+		ORDER BY MONTH(Date);
 	`;
   
 	db.query(query, (err, results) => {
-	  if (err) {
-		return res.status(500).json({ error: err.message });
-	  }
-  
-	  const formattedData = {
-		labels: [...new Set(results.map((row) => row.month))], 
-		datasets: [],
-	  };
-  
-	  const categories = [...new Set(results.map((row) => row.category))];
-  
-	  categories.forEach((category) => {
-		formattedData.datasets.push({
-		  label: category,
-		  data: results
-			.filter((row) => row.category === category)
-			.map((row) => row.total_sales),
+		if (err) {
+			return res.status(500).json({ error: err.message });
+		}
+	
+		const formattedData = {
+			labels: [...new Set(results.map((row) => row.month))], 
+			datasets: [],
+		};
+	
+		const categories = [...new Set(results.map((row) => row.category))];
+	
+		categories.forEach((category) => {
+			formattedData.datasets.push({
+			label: category,
+			data: results
+				.filter((row) => row.category === category)
+				.map((row) => row.total_sales),
+			});
 		});
-	  });
-  
-	  res.json(formattedData);
+	
+		res.json(formattedData);
 	});
-  });
+});
   
-  app.get("/api/orders-data", (req, res) => {
+app.get("/api/orders-data", (req, res) => {
 	const query = `
-	  SELECT 
-		DATE_FORMAT(created_at, '%M') AS month, 
-		category, 
-		COUNT(*) AS total_orders 
-	  FROM transaction 
-	  GROUP BY month, category 
-	  ORDER BY MONTH(created_at);
+		SELECT 
+			DATE_FORMAT(Date, '%M') AS month, 
+			Item_Name as category, 
+			COUNT(*) AS total_orders 
+		FROM transaction 
+		GROUP BY month, Item_Name 
+		ORDER BY MONTH(Date);
 	`;
-  
+	
 	db.query(query, (err, results) => {
-	  if (err) {
-		return res.status(500).json({ error: err.message });
-	  }
-  
-	  const formattedData = {
-		labels: [...new Set(results.map((row) => row.month))], // Unique months
-		datasets: [],
-	  };
-  
-	  const categories = [...new Set(results.map((row) => row.category))];
-  
-	  categories.forEach((category) => {
-		formattedData.datasets.push({
-		  label: category,
-		  data: results
+		if (err) {
+			return res.status(500).json({ error: err.message });
+		}
+	
+		const formattedData = {
+			labels: [...new Set(results.map((row) => row.month))], 
+			datasets: [],
+		};
+	
+		const categories = [...new Set(results.map((row) => row.category))];
+	
+		categories.forEach((category) => {
+			formattedData.datasets.push({
+			label: category,
+			data: results
 			.filter((row) => row.category === category)
 			.map((row) => row.total_orders),
+			});
 		});
-	  });
-  
-	  res.json(formattedData);
+	
+		res.json(formattedData);
 	});
-  });
+});
 
+
+app.get("/api/test/transaction", (req, res) => {
+    db.query("DESCRIBE transaction", (err, result) => {
+        if (err) {
+            console.error("Error describing transaction table:", err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result);
+    });
+});
+
+app.get("/api/dashboard/total-sales", (req, res) => {
+    const query = `
+        SELECT COALESCE(SUM(Amount), 0) as total_sales 
+        FROM transaction
+        WHERE Status IS NULL OR Status != 'Cancelled'
+    `;
+    
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Error in total sales query:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result[0]);
+    });
+});
+
+app.get("/api/dashboard/total-orders", (req, res) => {
+    const query = `
+        SELECT COUNT(*) as total_orders 
+        FROM transaction
+        WHERE Status IS NULL OR Status != 'Cancelled'
+    `;
+    
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Error in total orders query:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result[0]);
+    });
+});
+
+app.get("/api/dashboard/low-stock", (req, res) => {
+    const query = `
+        SELECT COUNT(*) as low_stock 
+        FROM inventory 
+        WHERE Quantity < 10 AND Quantity > 0
+    `;
+    
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Error in low stock query:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result[0]);
+    });
+});
+
+app.get("/api/dashboard/available-stocks", (req, res) => {
+    const query = `
+        SELECT COALESCE(SUM(Quantity), 0) as total_stocks 
+        FROM inventory
+        WHERE Quantity > 0
+    `;
+    
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Error in available stocks query:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result[0]);
+    });
+});
+
+app.get("/api/dashboard/new-orders", (req, res) => {
+    const query = `
+        SELECT COUNT(*) as new_orders 
+        FROM transaction 
+        WHERE Date >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        AND (Status IS NULL OR Status != 'Cancelled')
+    `;
+    
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Error in new orders query:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result[0]);
+    });
+});
+
+app.get("/api/dashboard/fast-moving-items", (req, res) => {
+    const query = `
+        SELECT 
+            Item_Name,
+            COUNT(*) as order_count
+        FROM transaction
+        WHERE Status IS NULL OR Status != 'Cancelled'
+        GROUP BY Item_Name
+        ORDER BY order_count DESC
+        LIMIT 5
+    `;
+    
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Error in fast moving items query:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result);
+    });
+});
 
 // BULLETIN PAGE
 // DISPLAY EVENT AND ANNOUNCEMENT
@@ -159,210 +270,290 @@ function verifyToken(req, res, next) {
 	if (!token) return res.status(403).json({ message: 'Token required' });
   
 	jwt.verify(token, 'secret_key', (err, decoded) => {
-		if (err) return res.status(403).json({ message: 'Invalid or expired token' });
-		req.userId = decoded.id; // Store user ID in the request
+		if (err) return res.status(403).json({ message: 'Login expired, please login again' });
+		req.userId = decoded.id;
 		next();
 	});
 }
 // FETCH ALL DATA IN CART AND DISPLAY TO CART PAGE
 app.get("/cartItem", verifyToken, (req, res) => {
-	const userId = req.userId;
+    const userId = req.userId;
 
-	db.query("SELECT * FROM item_cart WHERE User_ID = ?", [userId], (err, result) => {
-		if (err) throw err;
-		if (result.length === 0) return res.status(404).json({ message: 'No items in cart' });
-		res.json({ cartItems: result.length ? result : [] });
-	});
+    db.query("SELECT * FROM item_cart WHERE User_ID = ?", [userId], (err, result) => {
+        if (err) return res.status(500).json({ error: "Database error" });
+        res.json({ cartItems: result.length ? result : [] });
+    });
 });
+
 
 
 // EBA STORE PAGE
 // NOTICED THE CUSTOMER THROUGH EMAIL AFTER THE ORDER HAS BEEN CONFIRMED
-const sendEmail = (ItemName, Variant, CustomerName, EmailAddress, Amount, ID, formattedDate) => {
-	function order() {
-		const currentYear = new Date().getFullYear();
-		const orderID = `${currentYear}0${ID}`;
 
-		return orderID;
-	}
-
-	const transporter = nodemailer.createTransport({
-		service: 'gmail', 
-		auth: {
-			user: 'cvsutanzaeba@gmail.com', 
-			pass: 'thai euuc ller olga',
-		},
-	});
-
-	const orderNumber = order();
-	const variantDisplay = Variant ? (Variant.trim() ? Variant : "") : "";
-	const mailOptions = {
-		from: 'cvsutanzaeba@gmail.com',
-		to: EmailAddress,
-		subject: 'Order Details',
-		html: `
-			<header style='height: 150px; background: #c1ff72; display: flex; flex-direction: column; gap: 10px;'>
-				<img src="http://localhost:3000/capstone/public/logo.png" style='width: 80px; height: 80px;'/>
-				<h2>External Business and<br>Affairs</h2>
-			</header>
-
-			<br>
-
-			<h3>Thank you for your order!</h3>
-			<p>${CustomerName}</p>
-			<p>Your order was received! We're working to get order processed and be ready to claim.</p>
-
-			<br>
-
-			<div style='display: flex; align-items: center;'>
-				<div>
-					<p style='margin-right: 30px;'>Order Number:</p>
-					<span>#${orderNumber}<span>
-				</div>
-				<div>
-					<p>Order Date:</p>
-					<span>${formattedDate}</span>
-				</div>
-			</div>
-
-			<br>
-			
-			<table style="border: 1px solid gray; border-collapse: collapse; width: 100%; text-align: left;">
-				<tr>
-					<th style="border: 1px solid gray; padding: 8px; text-align: center;">PRODUCT</th>
-					<th style="border: 1px solid gray; padding: 8px; text-align: center;">PRICE</th>
-				</tr>
-				<tr>
-					<td style="border: 1px solid gray; padding: 8px; text-align: center;">${ItemName} ${variantDisplay ? `- ${variantDisplay}` : ''}</td>
-					<td style="border: 1px solid gray; padding: 8px; text-align: center;">${Amount}</td>
-				</tr>
-				<tr>
-					<td style="border: 1px solid gray; padding: 8px; text-align: center;"></td>
-					<td style="border: 1px solid gray; padding: 8px; text-align: center;">Total: P${Amount}</td>
-				</tr>
-			</table>
-
-			<p>Thank you for your purchase!</p>
-			<p>Cavite State University - Tanza Campus</p>
-		`
-	};
-
-	return new Promise((resolve, reject) => {
-		transporter.sendMail(mailOptions, (err, info) => {
-			if (err) {
-				console.error('Error sending email:', err);
-				reject(err);
-			}  	else {
-				console.log('Email sent: ' + info.response);
-				resolve(info);
-			}
-		});
-	});
-};
 // ADD CUSTOMER'S ORDER TO THE CART
 app.post("/addOrderUniform", upload.single('transaction'), (req, res) => {
-	const { transaction, ItemName, Variant, Size, Quantity, Amount, PhoneNumber } = req.body;
+	const {
+		UserID,
+		transaction,
+		ItemName,
+		Variant = '',
+		Size = '',
+		Quantity,
+		Amount,
+		PhoneNumber
+	} = req.body;
 
 	try {
-		const insertQuery = "INSERT INTO item_cart (Image, Item_Name, Variant, Size, Quantity, Amount, Phone_Number) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-		db.query(insertQuery, [transaction, ItemName, Variant, Size, Quantity, Amount, PhoneNumber], (err, result) => {
-			if (err) {
-				console.error("Error inserting data:", err);
-				return res.status(500).json({ Message: "Error inserting data" });
-			}
-			
-			return res.json({ Status: "Success" });
-		});
-	} catch (error) {
-		console.error('Error processing form data:', error);
-		res.status(500).send('Internal server error');
-	}
-});
-app.post("/addOrderItem", upload.single('transaction'), (req, res) => {
-	const { transaction, ItemName, Quantity, Amount, PhoneNumber } = req.body;
-
-	try {
-		const insertQuery = "INSERT INTO item_cart (Image, Item_Name, Quantity, Amount, Phone_Number) VALUES (?, ?, ?, ?, ?)";
-
-		db.query(insertQuery, [transaction, ItemName, Quantity, Amount, PhoneNumber], async (err, result) => {
-			if (err) {
-				console.error("Error inserting data:", err);
-				return res.status(500).json({ Message: "Error inserting data" });
-			}
-			return res.json({ Status: "Success" });
-		});
-	} catch (error) {
-		console.error('Error processing form data:', error);
-		res.status(500).send('Internal server error');
-	}
-});
-app.post('/checkout', (err, res) => {
-	db.beginTransaction((err) => {
-		const combineQuery = `
-			SELECT
-				ic.Image,
-				ic.Item_Name,
-				ic.Variant,
-				ic.Size,
-				ic.Quantity,
-				ic.Amount,
-				ic.Phone_Number,
-				ic.Date,
-				ua.Full_Name,
-				ua.Email_Address
-			FROM 
-				user_account ua
-			LEFT JOIN
-				item_cart ic
-			ON
-				ua.ID = ic.ID
-			WHERE
-				ua.ID = 1;
+		let checkQuery = `
+			SELECT * FROM item_cart 
+			WHERE User_ID = ? AND Item_Name = ? AND Variant = ? AND Size = ?
 		`;
-	
-		db.query(combineQuery, (err, results) => {
-			const Pending = 'Pending'
 
-			if (err) console.log('error')
-	
-			const insertQuery = `INSERT INTO transaction (Image, Item_Name, Variant, Size, Quantity, Amount, Customer_Name, Email_Address, Phone_Number, Date, Status) VALUES ?`;
-			const values = results.map(row => [
-				row.Image, row.Item_Name, row.Variant, row.Size, row.Quantity, row.Amount, row.Full_Name, row.Email_Address, row.Phone_Number, row.Date, Pending
-			])
-	
-			db.query(insertQuery, [values], async (err, insertResult) => {
-				if (err) console.log(err)
+		let checkParams = [UserID, ItemName, Variant, Size];
 
-				const orderID = insertResult.insertId;
-				
-				const currentDate = new Date();
-				const year = currentDate.getFullYear().toString().slice(-2);
-				const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-				const day = currentDate.getDate().toString().padStart(2, '0');
-				const formattedDate = `${month}-${day}-${year}`;
-	
-				for (const row of results) {
-					const {
-						Item_Name,
-						Variant,
-						Full_Name,
-						Email_Address,
-						Amount
-					} = row;
-					
-					try {
-						await sendEmail(Item_Name, Variant, Full_Name, Email_Address, Amount, orderID, formattedDate);
-						return res.json({ Status: "Success" });
-					} catch (emailError) {
-						console.error('Failed to send email:', emailError);
-						res.status(500).send('Failed to send email.');
+		db.query(checkQuery, checkParams, (err, results) => {
+			if (err) {
+				console.error("Error checking item:", err);
+				return res.status(500).json({ Message: "Database error" });
+			}
+
+			if (results.length > 0) {
+				let existingItem = results[0];
+				let newQuantity = existingItem.Quantity + parseInt(Quantity);
+
+				let updateQuery = `
+					UPDATE item_cart 
+					SET Quantity = ? 
+					WHERE User_ID = ? AND Item_Name = ? AND Variant = ? AND Size = ?
+				`;
+
+				let updateParams = [newQuantity, UserID, ItemName, Variant, Size];
+
+				db.query(updateQuery, updateParams, (err, result) => {
+					if (err) {
+						console.error("Error updating quantity:", err);
+						return res.status(500).json({ Message: "Failed to update cart" });
 					}
-				}
-			})
-		})
-	})
-})
+
+					return res.json({ Status: "Updated", UpdatedQuantity: newQuantity });
+				});
+			} else {
+				let insertQuery = `
+					INSERT INTO item_cart 
+					(User_ID, Image, Item_Name, Variant, Size, Quantity, Amount, Phone_Number) 
+					VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+				`;
+
+				let values = [
+					UserID,
+					transaction,
+					ItemName,
+					Variant || '',
+					Size || '',
+					Quantity,
+					Amount,
+					PhoneNumber
+				];
+
+				db.query(insertQuery, values, (err, result) => {
+					if (err) {
+						console.error("Error inserting new item:", err);
+						return res.status(500).json({ Message: "Error inserting data" });
+					}
+
+					return res.json({ Status: "Inserted" });
+				});
+			}
+		});
+	} catch (error) {
+		console.error('Error processing form data:', error);
+		res.status(500).send('Internal server error');
+	}
+});
+
+
+app.delete("/cart/:id", (req, res) => {
+	const { id } = req.params;
+	
+	db.query("DELETE FROM item_cart WHERE ID = ?", [id], (err, result) => {
+		if (err) return res.status(500).send(err);
+		res.json({ message: 'Cart deleted successfully.' });
+	});
+});
+const transporter = nodemailer.createTransport({
+	service: 'gmail', 
+	auth: {
+		user: 'cvsutanzaeba@gmail.com', 
+		pass: 'thai euuc ller olga',
+	},
+});
+app.post('/checkout', (req, res) => {
+    const { userId } = req.body;
+
+    db.beginTransaction((err) => {
+        if (err) {
+            console.error("Transaction Error:", err);
+            return res.status(500).json({ error: "Transaction failed" });
+        }
+
+        const combineQuery = `
+            SELECT
+                ic.Image,
+                ic.Item_Name,
+                ic.Variant,
+                ic.Size,
+                ic.Quantity,
+                ic.Amount,
+                ic.Phone_Number,
+                ic.Date,
+                ua.Full_Name,
+                ua.Email_Address
+            FROM 
+                user_account ua
+            LEFT JOIN
+                item_cart ic
+            ON
+                ua.ID = ic.User_ID
+            WHERE
+                ua.ID = ?;
+        `;
+
+        db.query(combineQuery, [userId], (err, results) => {
+            if (err) {
+                console.error("Query Error:", err);
+                return db.rollback(() => res.status(500).json({ error: "Query failed" }));
+            }
+
+            const cartItems = results.filter(row => row.Item_Name !== null);
+
+			if (cartItems.length === 0) {
+				console.log("Your cart is empty");
+				return db.rollback(() => res.status(400).json({ error: "Your cart is empty" }));
+			}
+
+            const Pending = 'Pending';
+
+            const insertQuery = `
+                INSERT INTO transaction 
+                (Image, Item_Name, Variant, Size, Quantity, Amount, Customer_Name, Email_Address, Phone_Number, Date, Status) 
+                VALUES ?
+            `;
+
+            const values = cartItems.map(row => [
+				row.Image, row.Item_Name, row.Variant, row.Size, row.Quantity,
+				row.Amount * row.Quantity, row.Full_Name, row.Email_Address, row.Phone_Number,
+				row.Date, Pending
+			]);
+
+            db.query(insertQuery, [values], async (err, insertResult) => {
+                if (err) {
+                    console.error("Insert Error:", err);
+                    return db.rollback(() => res.status(500).json({ error: "Insert failed" }));
+                }
+
+                const orderID = insertResult.insertId;
+                const currentDate = new Date();
+                const year = currentDate.getFullYear().toString().slice(-2);
+                const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+                const day = currentDate.getDate().toString().padStart(2, '0');
+                const formattedDate = `${month}-${day}-${year}`;
+
+                try {
+					const itemRowsHTML = cartItems.map(row => {
+						const variantDisplay = row.Variant?.trim() ? row.Variant : '';
+						const sizeDisplay = row.Size?.trim() ? row.Size : '';
+						const productDisplay = [row.Item_Name, variantDisplay, sizeDisplay]
+							.filter(part => part) 
+							.join(' - ');
+					
+						return `
+							<tr>
+								<td style="border: 1px solid gray; padding: 8px; text-align: center;">${productDisplay}</td>
+								<td style="border: 1px solid gray; padding: 8px; text-align: center;">₱${row.Amount} x ${row.Quantity} = ₱${row.Amount * row.Quantity}</td>
+							</tr>
+						`;
+					}).join('');
+					
+
+					const totalAmount = cartItems.reduce((sum, row) => sum + (row.Amount * row.Quantity), 0);
+					const user = cartItems[0];
+
+					const orderID = `${new Date().getFullYear()}0${insertResult.insertId}`;
+
+					const mailOptions = {
+						from: 'cvsutanzaeba@gmail.com',
+						to: user.Email_Address,
+						subject: 'Order Details',
+						html: `
+							<header style='height: 150px; background: #c1ff72; display: flex; flex-direction: column; gap: 10px;'>
+								<img src="https://res.cloudinary.com/dfmnlcvbe/image/upload/v1744102780/logo_qy0g8a.png" style='width: 80px; height: 80px;'/>
+								<h2>External Business and<br>Affairs</h2>
+							</header>
+
+							<br>
+
+							<h3>Thank you for your order!</h3>
+							<p>${user.Full_Name}</p>
+							<p>Your order was received! We're working to get it processed and ready to claim.</p>
+
+							<br>
+
+							<div style='display: flex; align-items: center;'>
+								<div style="margin-right: 30px;">
+									<p>Order Number:</p>
+									<span>#${orderID}</span>
+								</div>
+								<div>
+									<p>Order Date:</p>
+									<span>${formattedDate}</span>
+								</div>
+							</div>
+
+							<br>
+
+							<table style="border: 1px solid gray; border-collapse: collapse; width: 100%; text-align: left;">
+								<tr>
+									<th style="border: 1px solid gray; padding: 8px; text-align: center;">PRODUCT</th>
+									<th style="border: 1px solid gray; padding: 8px; text-align: center;">PRICE</th>
+								</tr>
+								${itemRowsHTML}
+								<tr>
+									<td style="border: 1px solid gray; padding: 8px; text-align: center;"></td>
+									<td style="border: 1px solid gray; padding: 8px; text-align: center;"><strong>Total: P${totalAmount}</strong></td>
+								</tr>
+							</table>
+
+							<p>Thank you for your purchase!</p>
+							<p>Cavite State University - Tanza Campus</p>
+						`
+					};
+
+					await transporter.sendMail(mailOptions);
+
+                    db.query("DELETE FROM item_cart WHERE User_ID = ?", [userId], (err) => {
+                        if (err) {
+                            console.error("Cart Clear Error:", err);
+                            return db.rollback(() => res.status(500).json({ error: "Failed to clear cart" }));
+                        }
+
+                        db.commit((err) => {
+                            if (err) {
+                                console.error("Commit Error:", err);
+                                return db.rollback(() => res.status(500).json({ error: "Transaction commit failed" }));
+                            }
+
+                            res.json({ Status: "Success" });
+                        });
+                    });
+                } catch (emailError) {
+                    console.error("Email Error:", emailError);
+                    return db.rollback(() => res.status(500).json({ error: "Email sending failed" }));
+                }
+            });
+        });
+    });
+});
+
 
 
 // ADMINPANEL
@@ -386,6 +577,30 @@ app.post('/adminlogin', (req, res) => {
 	})
 })
 
+app.post('/adminchangepass', async (req, res) => {
+	const { id, password } = req.body;
+
+	if (!id || !password) {
+		return res.status(400).json({ message: 'Missing ID or password' });
+	}
+
+	try {
+		const hashedPassword = await bcrypt.hash(password, 10);
+		const query = "UPDATE admin_account SET Password = ? WHERE ID = ?";
+
+		db.query(query, [hashedPassword, id], (err, result) => {
+			if (err) {
+				console.error(err);
+				return res.status(500).json({ message: 'Error updating password' });
+			}
+			return res.status(200).json({ message: 'Password updated' });
+		});
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({ message: 'Server error' });
+	}
+});
+
 
 // DASHBOARD PAGE
 
@@ -393,7 +608,8 @@ app.post('/adminlogin', (req, res) => {
 // TRANSACTION PAGE
 // FETCH AND DISPLAY THE DATA
 app.get("/transaction", (req, res) => {
-	db.query("SELECT * FROM transaction", (err, results) => {
+	const order = req.query.order === 'ASC' ? 'ASC' : 'DESC';
+	db.query(`SELECT * FROM transaction ORDER BY created_At ${order}`, (err, results) => {
 		if (err) return res.status(500).send(err);
 		res.json(results);
 	});
@@ -618,4 +834,105 @@ app.delete("/addnewadmin/:id", (req, res) => {
 		if (err) return res.status(500).send(err);
 		res.json({ message: 'Admin deleted successfully.' });
 	});
+});
+
+app.get("/api/dashboard/all", (req, res) => {
+    const queries = {
+        totalSales: `
+            SELECT COALESCE(SUM(Amount), 0) as total_sales 
+            FROM transaction
+            WHERE Status IS NULL OR Status != 'Cancelled'
+        `,
+        totalOrders: `
+            SELECT COUNT(*) as total_orders 
+            FROM transaction
+            WHERE Status IS NULL OR Status != 'Cancelled'
+        `,
+        lowStock: `
+            SELECT COUNT(*) as low_stock 
+            FROM inventory 
+            WHERE Quantity < 10 AND Quantity > 0
+        `,
+        availableStocks: `
+            SELECT COALESCE(SUM(Quantity), 0) as total_stocks 
+            FROM inventory
+            WHERE Quantity > 0
+        `,
+        newOrders: `
+            SELECT COUNT(*) as new_orders 
+            FROM transaction 
+            WHERE Date >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+            AND (Status IS NULL OR Status != 'Cancelled')
+        `,
+        fastMovingItems: `
+            SELECT 
+                Item_Name,
+                COUNT(*) as order_count
+            FROM transaction
+            WHERE Status IS NULL OR Status != 'Cancelled'
+            GROUP BY Item_Name
+            ORDER BY order_count DESC
+            LIMIT 5
+        `,
+        salesData: `
+            SELECT 
+                DATE_FORMAT(Date, '%M') AS month, 
+                Item_Name as category, 
+                SUM(Amount) AS total_sales 
+            FROM transaction 
+            WHERE Status IS NULL OR Status != 'Cancelled'
+            GROUP BY month, Item_Name 
+            ORDER BY MONTH(Date)
+        `,
+        ordersData: `
+            SELECT 
+                DATE_FORMAT(Date, '%M') AS month, 
+                Item_Name as category, 
+                COUNT(*) AS total_orders 
+            FROM transaction 
+            WHERE Status IS NULL OR Status != 'Cancelled'
+            GROUP BY month, Item_Name 
+            ORDER BY MONTH(Date)
+        `
+    };
+
+    const results = {};
+    let completedQueries = 0;
+    const totalQueries = Object.keys(queries).length;
+
+    Object.entries(queries).forEach(([key, query]) => {
+        db.query(query, (err, result) => {
+            if (err) {
+                console.error(`Error in ${key} query:`, err);
+                return res.status(500).json({ error: err.message });
+            }
+
+            if (key === 'salesData' || key === 'ordersData') {
+                const formattedData = {
+                    labels: [...new Set(result.map((row) => row.month))],
+                    datasets: []
+                };
+
+                const categories = [...new Set(result.map((row) => row.category))];
+
+                categories.forEach((category) => {
+                    formattedData.datasets.push({
+                        label: category,
+                        data: result
+                            .filter((row) => row.category === category)
+                            .map((row) => key === 'salesData' ? row.total_sales : row.total_orders)
+                    });
+                });
+
+                results[key] = formattedData;
+            } else {
+                results[key] = result[0];
+            }
+
+            completedQueries++;
+            if (completedQueries === totalQueries) {
+                res.json(results);
+            }
+        });
+    });
 });

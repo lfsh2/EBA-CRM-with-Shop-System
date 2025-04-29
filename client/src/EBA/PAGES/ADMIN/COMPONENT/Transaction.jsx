@@ -12,13 +12,14 @@ const Transaction = () => {
 
     const [details, setDetails] = useState(null);
     const [formData, setFormData] = useState({});
+	const [sortOrder, setSortOrder] = useState('DESC');
 
     useEffect(() => {
-        fetchTransactions();
-    }, []);
+        fetchTransactions(sortOrder);
+    }, [sortOrder]);
     
-    const fetchTransactions = async () => {
-        const response = await axios.get('http://localhost:3000/transaction');
+    const fetchTransactions = async (order) => {
+        const response = await axios.get(`  http://localhost:3000/transaction?order=${order}`);
         setTransactions(response.data);
     };
 
@@ -28,6 +29,10 @@ const Transaction = () => {
 
 	const toggleTables = () => {
 		setTables(!tables);
+	};
+
+    const toggleSortOrder = () => {
+		setSortOrder(prev => (prev === 'DESC' ? 'ASC' : 'DESC'));
 	};
     
     const formatDate = (dateString) => {
@@ -53,10 +58,10 @@ const Transaction = () => {
     };
 
     const confirmOrder = () => {
-        alert('ang order ay kompirmado')
+        alert('Order Confirmed')
     }
     const cancelOrder = () => {
-        alert('ang order ay kanselado')
+        alert('Order Cancelled')
     }
 
     return (
@@ -78,7 +83,7 @@ const Transaction = () => {
                         <FontAwesomeIcon icon={faFilter} className='filter' onClick={() => setFilter(!filter)} />
                         {filter && (
                             <div className="filter-dropdown">
-                                <button>Date</button>
+                                <button onClick={toggleSortOrder}>Date</button>
                                 <button>Status</button>
                             </div>
                         )}
@@ -86,44 +91,53 @@ const Transaction = () => {
                 </div>
 
                 <div className="table">
-                    {table ? (
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Image</th>
-                                    <th>Item Name</th>
-                                    <th>Variant</th>
-                                    <th>Size</th>
-                                    <th>Quantity</th>
-                                    <th>Amount</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Item Name</th>
+                                <th>Variant</th>
+                                <th>Size</th>
+                                <th>Quantity</th>
+                                <th>Amount</th>
+                                <th>Customer Name</th>
+                                <th>Email Address</th>
+                                <th>Phone Number</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
 
-                            <tbody>
-                                {transactions.length === 0 ? (
-                                    <tr>
-                                        <th><h3 className='no'>No Transaction</h3></th>
-                                    </tr>
-                                ) : (
-                                    <>
-                                        {transactions.map((transaction, index) => (
-                                            <tr key={index}>
-                                                <td><img src={transaction.Image} alt="" /> </td>
-                                                <td>{transaction.Item_Name}</td>
-                                                <td>{transaction.Variant || '-'}</td>
-                                                <td>{transaction.Size || '-'}</td>
-                                                <td>{transaction.Quantity}</td>
-                                                <td>{transaction.Amount}</td>
-                                                <td className='btn'>
-                                                    <button onClick={() => handleDetails(transaction)}>See Details</button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </>
-                                )}
-                            </tbody>
-                        </table>
+                        <tbody>
+                            {transactions.length === 0 ? (
+                                <tr>
+                                    <th><h3 className='no'>No Transaction</h3></th>
+                                </tr>
+                            ) : (
+                                <>
+                                    {transactions.map((transaction, index) => (
+                                        <tr key={index}>
+                                            <td><img src={transaction.Image} alt="" /> </td>
+                                            <td>{transaction.Item_Name}</td>
+                                            <td>{transaction.Variant || '-'}</td>
+                                            <td>{transaction.Size || '-'}</td>
+                                            <td>{transaction.Quantity}</td>
+                                            <td>{transaction.Amount}</td>
+                                            <td>{transaction.Customer_Name}</td>
+                                            <td>{transaction.Email_Address}</td>
+                                            <td>{transaction.Phone_Number}</td>
+                                            <td>{formatDate(transaction.Date)}</td>
+                                            <td>{transaction.Status}</td>
+                                            <td className='btn'>
+                                                <button onClick={() => handleDetails(transaction)}>See Details</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </>
+                            )}
+                        </tbody>
+                    </table>
+                    {/* {table ? (
                     ) : (
                         <table>
                             <thead>
@@ -160,7 +174,7 @@ const Transaction = () => {
                             )}
                             </tbody>
                         </table>
-                    )}
+                    )} */}
                 </div>
 
                 {details && (
@@ -218,7 +232,7 @@ const Transaction = () => {
                                         </div>
                                         <div className="detail-block">
                                             <label>Date: </label>
-                                            <p>{formData.date}</p>
+                                            <p>{formatDate(formData.date)}</p>
                                         </div>
                                         <div className="detail-block">
                                             <label>Status: </label>

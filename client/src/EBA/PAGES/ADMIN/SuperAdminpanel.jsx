@@ -12,13 +12,14 @@ import AddDesign from './COMPONENT/AddDesign';
 import Pages from './COMPONENT/Pages';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faEnvelope, faBell, faSun, faMoon, faX, } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faEnvelope, faBell, faSun, faMoon, faX, faChevronDown, } from '@fortawesome/free-solid-svg-icons';
 
 import './CSS/Admin.css';
 import './CSS/Component.css';
 
 const AdminPanel = () => {
 	const [isDarkMode, setIsDarkMode] = useState(false);
+	const [openDropdown, setOpenDropdown] = useState(false);
 	const [activeAdmin, setActiveComponent] = useState('Dashboard');
 	const [isOpen, setIsOpen] = useState(false);
 	const [image, setImage] = useState('');

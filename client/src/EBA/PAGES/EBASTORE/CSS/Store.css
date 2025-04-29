@@ -181,18 +181,29 @@
         
         nav {
             width: 100%;
-            padding: 10px 0;
+            padding: 20px 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
         
-            .group {
+            a {
+                color: #34BB42;
+                text-decoration: none;
                 display: flex;
                 align-items: center;
                 gap: 10px;
-                a {
-                    color: #34BB42;
-                    text-decoration: none;
+            }
+
+            .group {
+                display: flex;
+                align-items: center;
+                gap: 30px;
+                
+                button {
+                    background: none;
+                    border: none;
+                    font-size: 1rem;
+                    cursor: pointer;
                 }
             }
         }

@@ -11,9 +11,9 @@ const Cart = () => {
 
     const [totalSum, setTotalSum] = useState(null);
     const [totalQuantity, setTotalQuantity] = useState(null);
-
+    
+    const [userId, setUserId] = useState('');
     const [message, setMessage] = useState('');
-    const [messages, setMessages] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     
     const token = localStorage.getItem('token');
@@ -25,6 +25,13 @@ const Cart = () => {
             return;
         }
 
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+		setUserId(decodedToken.id); 
+
+        fetchCart();
+    }, []);
+
+    const fetchCart = () => {
         axios.get('http://localhost:3000/cartItem', {
             headers: {
                 Authorization: token,
@@ -32,18 +39,14 @@ const Cart = () => {
         })
         .then((response) => {
             setCart(response.data.cartItems);
+            getTotal(response.data.cartItems)
+            getQuantity(response.data.cartItems)
         })
         .catch((err) => {
-            setMessages(err.response ? err.response.data.message : 'An error occurred');
+            alert(err.response ? err.response.data.message : 'An error occurred');
+			window.location.href = '/userlogin';
         });
-    }, []);
-    
-	const fetchCart = async () => {
-		const response = await axios.get('http://localhost:3000/cartItem');
-		setCart(response.data);
-        getTotal(response.data)
-        getQuantity(response.data)
-	};
+    }
 
     const getTotal = (data) => {
         const sum = data.reduce((acc, item) => acc + item.Amount * item.Quantity, 0)
@@ -55,21 +58,50 @@ const Cart = () => {
     }
 
     const handleCheckout = async () => {
+        if (!userId) {
+            setMessage('User not found. Please log in.');
+            return;
+        }
+
         setIsLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:3000/checkout');
-            setMessage(response.data.message || 'Checkout successfully');
+            const response = await axios.post('http://localhost:3000/checkout', {
+                userId
+            });
+
+            if (response.data.Status === "Success") {
+                setMessage('Checkout successful!');
+                fetchCart();
+                
+                setTimeout(() => {
+                    setMessage('');
+                }, 2000);
+            } else {
+                setMessage('Checkout failed. Please try again.');
+            }
+        } catch (error) {
+            setMessage('Your cart is empty');
+            
             setTimeout(() => {
                 setMessage('');
-                fetchCart()
-            }, 2000)
-        } catch (error) {
-            console.error('Error inserting data: ', error);
-            setMessage('Error inserting data');
+            }, 2000);
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
+    };
+    
+    
+    const handleRemove = async (id) => {
+        await axios.delete(`http://localhost:3000/cart/${id}`);
+        setCart(carts.filter(cart => cart.ID !== id));
+        
+        setMessage("Cart item deleted successfully");
+        setTimeout(() => {
+            setMessage('');
+        }, 2000);
+        
+        fetchCart();
     };
     
     return (
@@ -83,15 +115,11 @@ const Cart = () => {
                         </a>
 
                         <h1>My Cart</h1>
-
-                        {isLoading && <div className="loading">
-                            <div class="sending">Placing Order<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>
-                        </div>}
                     </div>
 
                     {carts.length === 0 ? (
                         <div className="cart">
-                            <h2>{messages}</h2>
+                            <h2>Your cart is empty</h2>
                         </div>
                     ) : (
                         <>
@@ -103,16 +131,18 @@ const Cart = () => {
                                         <div className="info">
                                             <p className='th'>{cart.Item_Name}</p>
                                             <p className="td tds">{cart.Variant}</p>
-                                            <button>Delete</button>
+                                            <button onClick={() => handleRemove(cart.ID)}>Delete</button>
                                         </div>
                                     </div>
 
                                     <div className="info-block text">
-                                        <div className="info">
-                                            <p className="th">Size</p>
-                                            <p className="td">{cart.Size}</p>
-                                            <p></p>
-                                        </div>
+                                        {cart.Item_Name !== 'Modules' && cart.Item_Name !== 'Capstone Manual' && (
+                                            <div className="info">
+                                                <p className="th">Size</p>
+                                                <p className="td">{cart.Size}</p>
+                                                <p></p>
+                                            </div>
+                                        )}
 
                                         <div className="info">
                                             <p className="th">Quantity</p>
@@ -132,10 +162,6 @@ const Cart = () => {
                     )}
 
                     {message && <div className='message'>{message}</div>}
-                </div>
-
-                <div className="order-now">
-                    <button>Order Now</button>
                 </div>
             </div>
 
@@ -161,7 +187,15 @@ const Cart = () => {
                             <span>P{totalSum}</span>
                         </div>
 
-                        <button type='button' onClick={handleCheckout}>Checkout</button>
+                        <button type='button' onClick={handleCheckout}>
+                            {isLoading ? (
+                                <div className="loading">
+                                    <div class="sending">Placing Order<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>
+                                </div>
+                            ) : (
+                                <span>Checkout</span>
+                            )}
+                        </button>
                     </div>
                 </div>
             </div>

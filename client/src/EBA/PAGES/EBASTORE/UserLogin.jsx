@@ -6,11 +6,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 import './CSS/LandingStore.css';
+import './CSS/Preloader.css';
 import InputForm from '../../InputForm';
 
 const UserLogin = () => {
 	const navigateTo = useNavigate();
 	const [message, setMessage] = useState('');
+	const [loading, setLoading] = useState(false);
 	const [values, setValues] = useState({
 		email: '',
 		password: ''
@@ -44,18 +46,42 @@ const UserLogin = () => {
 	
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		setLoading(true);
 	
 		try {
 			const response = await axios.post('http://localhost:3000/userlogin', values);
 			const { token } = response.data;
 
 			localStorage.setItem('token', token);
-		
-			navigateTo('/ebastore');
+			
+			// Wait for 3 seconds to show the preloader
+			setTimeout(() => {
+				setLoading(false);
+				navigateTo('/ebastore');
+			}, 3000);
 		} catch (err) {
+			setLoading(false);
 		  	setMessage('Invalid credentials');
 		}
 	};
+
+	if (loading) {
+		return (
+			<div className="preloader">
+				<div className="preloader-content">
+					<div className="cube-loader">
+						<div className="cube"></div>
+						<div className="cube"></div>
+						<div className="cube"></div>
+						<div className="cube"></div>
+						<div className="cube"></div>
+						<div className="cube"></div>
+					</div>
+					<div className="preloader-text">Logging in...</div>
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className='login-form'>

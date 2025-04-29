@@ -36,23 +36,24 @@
 		.card {
 			width: 400px;
 			max-height: 400px;
-            min-height: 400px;
-            height: 100%;
-			padding: 10px;
+			min-height: 400px;
+			height: 100%;
+			padding: 20px;
 			background: var(--bg-color);
 			border-radius: 10px;
 			flex-grow: 1;
 			overflow-y: auto;
 
 			h2 {
-				padding-bottom: 5px;
+				padding-bottom: 10px;
 				border-bottom: 1px solid #acacac;
+				margin-bottom: 20px;
 			}
-		}
-		
-		.orders {
-			max-width: 50%;
-			width: 100%;
+
+			canvas {
+				width: 100% !important;
+				height: 300px !important;
+			}
 		}
 	}
 
@@ -62,6 +63,23 @@
         td {
             height: auto;
         }
+
+		.cards{
+			padding: 0;
+			background: none;
+			display: flex;
+			gap: 20px;
+		}
+		
+		.orders-card {
+			max-height: 400px;
+            height: 100%;
+			padding: 10px;
+			background: var(--bg-color);
+			border-radius: 10px;
+			flex-grow: 1;
+			overflow-y: auto;
+		}
 	}
 
 	.pending-block {
@@ -76,7 +94,7 @@
 			width: 100%;
 			padding: 10px;
 			display: flex;
-			justify-content: space-between;
+			justify-content: start;
 			align-items: center;
 			gap: 10px;
 			border: 1px solid var(--txt-color);
@@ -135,7 +153,8 @@
 		}
 	}
 
-	table {
+	.table {
+		max-width: 500px !important;
 		button {
 			--btn-bg1: #FF9000;
 			--btn-bg2: #4E91F6;
@@ -388,10 +407,7 @@
 @media screen and (max-width: 992px) {
     .dashboard {
         .top {
-            .card {
-                max-width: 49%;
-                width: 100%;
-            }
+			flex-wrap: wrap;
         }
         .graphs {
             flex-wrap: wrap;

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import './CSS/Store.css'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faLocationDot, faChevronRight, faMagnifyingGlass, faMicrophone, faPlus, faCartShopping } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faLocationDot, faChevronRight, faMagnifyingGlass, faMicrophone, faPlus, faCartShopping, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
 const data = {
 	uniform: [
@@ -48,7 +48,9 @@ const Store = () => {
 	const [filteredCategory, setFilteredCategory] = useState('all');
 
 	const [openModal, setOpenModal] = useState(false);
+	const [formHide, setFormHide] = useState(false);
 
+	const [userId, setUserId] = useState('');
 	const [image, setImage] = useState();
 	const [itemName, setItemName] = useState('');
 	const [variantName, setVariantName] = useState('');
@@ -75,7 +77,12 @@ const Store = () => {
 		const decodedToken = JSON.parse(atob(token.split('.')[1]));
 		setFullName(decodedToken.fullname);
 		setEmailAddress(decodedToken.email);
-	
+		setUserId(decodedToken.id);
+
+		fetchCart();
+	}, [token]);
+
+	const fetchCart = () => {
 		axios.get('http://localhost:3000/cartItem', {
 			headers: {
 				Authorization: token,
@@ -85,10 +92,11 @@ const Store = () => {
 			const cartItems = response.data.cartItems || [];
 			setCart(cartItems); 
 		})
-		.catch((err) => {
-			console.error(err.response ? err.response.data.message : 'An error occurred');
-		});
-	}, [token]);
+        .catch((err) => {
+            alert(err.response ? err.response.data.message : 'An error occurred');
+			window.location.href = '/userlogin';
+        });
+	}
 
 	const handleLogout = () => {
 		localStorage.removeItem('token');
@@ -112,6 +120,7 @@ const Store = () => {
 		const formData = new FormData();
 		formData.append('transaction', image);
 
+		formData.append('UserID', userId);
 		formData.append('ItemName', itemName);
 		formData.append('Variant', variantName);
 		formData.append('Size', size);
@@ -133,19 +142,16 @@ const Store = () => {
 				setMessage("Added to the cart successfully");
 				setTimeout(() => {
 					setMessage('');
-					location.reload()
 				}, 2000);
 
-				setOpenUniform(false);
+				setOpenModal(false);
+				fetchCart();
 
 				setItemName('');
 				setVariantName('');
 				setSize('');
 				setQuantity('');
-				setFullName('');
-				setEmailAddress('');
 				setPhone('');
-				setAmount('');
 			} else {
 				console.log('failed submit')
 			}
@@ -164,41 +170,39 @@ const Store = () => {
 		}
 		createOrderItem();
 	}
-	
+
 	const createOrderItem = async () => {
 		const formData = new FormData();
 		formData.append('transaction', image);
 
+		formData.append('UserID', userId);
 		formData.append('ItemName', itemName);
 		formData.append('Quantity', quantity);
 		formData.append('CustomerName', fullName);
 		formData.append('EmailAddress', emailAddress);
 		formData.append('PhoneNumber', phone);
 		formData.append('Amount', amount);
-
+		
 		try {
-			const response = await fetch('http://localhost:3000/addOrderItem', {
+			const response = await fetch('http://localhost:3000/addOrderUniform', {
 				method: 'POST',
 				body: formData
 			});
-
+			
 			if (response.ok) {
 				console.log('data submitted')
 
 				setMessage("Added to the cart successfully");
 				setTimeout(() => {
 					setMessage('');
-					location.reload()
 				}, 2000);
-				
+
+				setOpenModal(false);
+				fetchCart();
 
 				setItemName('');
 				setQuantity('');
-				setFullName('');
-				setEmailAddress('');
 				setPhone('');
-				setPayment('');
-				setAmount('');
 			} else {
 				console.log('failed submit')
 			}
@@ -242,11 +246,14 @@ const Store = () => {
 			setItemName(item.name);
 			setImage(item.imgMale);
 			setOpenModal(true);
+			setFormHide(false);
 		} else if (item.name === 'Department Shirt') {
 			setShowDeptShirt(true);
+			setFormHide(true);
 		} else {
 			setSelectedItem(item);
 			setShowDeptShirt(false);
+			setFormHide(true);
 		}
 	};
 	
@@ -334,11 +341,6 @@ const Store = () => {
 								<h4>Order Information</h4>
 						
 								<div className="input-block">
-									<label>Image: </label>
-									<img src={image} alt="" />
-								</div>
-						
-								<div className="input-block">
 									<label>Item: </label>
 									<input
 									type="text"
@@ -349,28 +351,33 @@ const Store = () => {
 									/>
 								</div>
 						
-								<div className="input-block">
-									<label>Item Variant: </label>
-									<input
-									type="text"
-									value={variantName}
-									onChange={(e) => setVariantName(e.target.value)}
-									placeholder='Enter variant'
-									readOnly
-									/>
-								</div>
 						
-								<div className="input-block">
-									<label>Item Size: </label>
-									<input
-									type="text"
-									value={size}
-									onChange={(e) => setSize(e.target.value)}
-									placeholder='Enter size'
-									required
-									/>
-								</div>
-						
+								{formHide && (
+									<>
+										<div className="input-block">
+											<label>Item Variant: </label>
+											<input
+											type="text"
+											value={variantName}
+											onChange={(e) => setVariantName(e.target.value)}
+											placeholder='Enter variant'
+											readOnly
+											/>
+										</div>
+
+										<div className="input-block">
+											<label>Item Size: </label>
+											<input
+											type="text"
+											value={size}
+											onChange={(e) => setSize(e.target.value)}
+											placeholder='Enter size in centimeters'
+											required
+											/>
+										</div>
+								
+									</>
+								)}
 								<div className="input-block">
 									<label>Item Quantity: </label>
 									<input
@@ -393,7 +400,7 @@ const Store = () => {
 									value={fullName}
 									onChange={(e) => setFullName(e.target.value)}
 									placeholder='Enter your full name'
-									required
+									readOnly
 									/>
 								</div>
 						
@@ -404,7 +411,7 @@ const Store = () => {
 									value={emailAddress}
 									onChange={(e) => setEmailAddress(e.target.value)}
 									placeholder='Enter your address'
-									required
+									readOnly
 									/>
 								</div>
 						
@@ -433,7 +440,7 @@ const Store = () => {
 					
 							{formMessage && <div className='form-message'>{formMessage}</div>}
 					
-							<button	type="button" onClick={uniformFormValidation}>
+							<button	type="button" onClick={formHide ? uniformFormValidation : itemFormValidation}>
 								Place Order
 							</button>
 						</form>
@@ -444,11 +451,12 @@ const Store = () => {
 			<div className="store">
 				<header>
 					<nav>
+						<a href="/ebastore"><FontAwesomeIcon icon={faChevronLeft} className='icon'/> <h3>EBA Store</h3></a>
+
 						<div className="group">
-							<a href="/ebastore"><FontAwesomeIcon icon={faChevronLeft} className='icon'/></a>
-							<button onClick={handleLogout}><h3>EBA Store</h3></button>
+							<a href="/ebacart" className='cart'><FontAwesomeIcon icon={faCartShopping} /><span>{carts.length}</span></a>
+							<button onClick={handleLogout}><FontAwesomeIcon icon={faArrowRightFromBracket} /></button>
 						</div>
-						<a href="/ebacart" className='cart'><FontAwesomeIcon icon={faCartShopping} /><span>{carts.length}</span></a>
 					</nav>
 					
 					{shouldShowBackground && (

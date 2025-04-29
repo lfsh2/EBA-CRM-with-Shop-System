@@ -56,7 +56,8 @@ CREATE TABLE transaction (
 	Email_Address VARCHAR(255) NOT NULL,
 	Phone_Number INT NOT NULL,
 	Date DATE DEFAULT CURRENT_DATE NOT NULL,
-	Status VARCHAR(255)
+	Status VARCHAR(255),
+	created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE categories (
@@ -80,7 +81,7 @@ CREATE TABLE inventory (
 INSERT INTO user_account (Full_Name, Email_Address, Password) 
 VALUES 
 	('user', 'user@cvsu.edu.ph', '$2b$10$oD3/4NfcwFtUwipIy3nN1OtZmHCWZG0sBEzw2OiGPdVXhO7KM81Zq'),
-	('admin', 'admin@cvsu.edu.ph', '$2b$10$UgMbjFKc9X3Pm5SZhcHLyOON2qlw5PSp96WEh86BOdWilVHwo1OP.')
+	('admin', 'marcandrei.nisperos@cvsu.edu.ph', '$2b$10$UgMbjFKc9X3Pm5SZhcHLyOON2qlw5PSp96WEh86BOdWilVHwo1OP.')
 ;
 INSERT INTO admin_account (Image, Username, Role, Email_Address, Password) 
 VALUES 
