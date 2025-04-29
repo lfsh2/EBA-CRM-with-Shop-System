@@ -237,7 +237,7 @@ const Inventory = () => {
                             <>
                                 {filteredInventories.map(inventory => (
                                     <tr key={inventory.ID}>
-                                        <td><img src={`http://localhost:3000/UPLOADS/${inventory.Image}`} alt="" /></td>
+                                        <td><img src={`http://localhost:3000/ITEMS/${inventory.Image}`} alt="" /></td>
                                         <td>{inventory.Item_Name}</td>
                                         <td>{inventory.Variant || '-'}</td>
                                         <td>{inventory.Size || '-'}</td>

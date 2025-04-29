@@ -86,14 +86,8 @@ VALUES
 INSERT INTO admin_account (Image, Username, Role, Email_Address, Password) 
 VALUES 
 	('logo.png', 'admin', 'Admin', 'admin@cvsu.edu.ph', '$2b$10$UgMbjFKc9X3Pm5SZhcHLyOON2qlw5PSp96WEh86BOdWilVHwo1OP.'),
-	('admin_1742923666280.png', 'John Paulo Ramos', 'EBA', 'johnpaulo.ramos@cvsu.edu.ph', '$2b$10$2ga4BJrCwugur6B8Yz/GPu1NuN3WfQ5A9M5eO1oHwPTM1n6zSNI/m')
+	('paulo.png', 'John Paulo Ramos', 'EBA', 'johnpaulo.ramos@cvsu.edu.ph', '$2b$10$2ga4BJrCwugur6B8Yz/GPu1NuN3WfQ5A9M5eO1oHwPTM1n6zSNI/m')
 ;
-
--- BULLETIN PAGE
-INSERT INTO bulletin (Title, Details, Faculty, Faculty_Staff)
-VALUES (
-	'Sample Title', 'Sample Details', 'Ms.', 'Sample Faculty_Staff'
-);
 
 -- ADMIN PAGE
 INSERT INTO categories (Categories) 
@@ -106,5 +100,30 @@ VALUES
 ;
 INSERT INTO inventory (Image, Category, Item_Name, Variant, Size, Quantity, Price)
 VALUES 
-	('MaleUniform.png', 'Student Uniform', 'Student Uniform', 'Male', 'Small', 5, 300)
+	('STUDENT_UNIFORM/Male_Student_Uniform.png', 'Student Uniform', 'Student Uniform', 'Male', 'Medium', 20, 300),
+	('STUDENT_UNIFORM/Male_Student_Uniform.png', 'Student Uniform', 'Student Uniform', 'Male', 'Large', 20, 300),
+	('STUDENT_UNIFORM/Male_Student_Uniform.png', 'Student Uniform', 'Student Uniform', 'Male', 'Small', 5, 300),
+	('STUDENT_UNIFORM/Male_Student_Uniform.png', 'Student Uniform', 'Student Uniform', 'Male', 'Xtra Large', 20, 300),
+	('STUDENT_UNIFORM/Female_Student_Uniform.png', 'Student Uniform', 'Student Uniform', 'Female', 'Small', 3, 300),
+	('STUDENT_UNIFORM/Female_Student_Uniform.png', 'Student Uniform', 'Student Uniform', 'Female', 'Medium', 15, 300),
+	('STUDENT_UNIFORM/Female_Student_Uniform.png', 'Student Uniform', 'Student Uniform', 'Female', 'Large', 10, 300),
+	('STUDENT_UNIFORM/Female_Student_Uniform.png', 'Student Uniform', 'Student Uniform', 'Female', 'Xtra Large', 3, 300),
+	('FACULTY_UNIFORM/Faculty_Uniform.png', 'Faculty Uniform', 'Faculty Uniform', 'Male', 'Small', 3, 300),
+	('FACULTY_UNIFORM/Faculty_Uniform.png', 'Faculty Uniform', 'Faculty Uniform', 'Male', 'Medium', 5, 300),
+	('FACULTY_UNIFORM/Faculty_Uniform.png', 'Faculty Uniform', 'Faculty Uniform', 'Male', 'Large', 5, 300),
+	('FACULTY_UNIFORM/Faculty_Uniform.png', 'Faculty Uniform', 'Faculty Uniform', 'Male', 'Xtra Large', 1, 300),
+	('FACULTY_UNIFORM/Faculty_Uniform.png', 'Faculty Uniform', 'Faculty Uniform', 'Female', 'Small', 5, 300),
+	('FACULTY_UNIFORM/Faculty_Uniform.png', 'Faculty Uniform', 'Faculty Uniform', 'Female', 'Medium', 15, 300),
+	('FACULTY_UNIFORM/Faculty_Uniform.png', 'Faculty Uniform', 'Faculty Uniform', 'Female', 'Large', 15, 300),
+	('FACULTY_UNIFORM/Faculty_Uniform.png', 'Faculty Uniform', 'Faculty Uniform', 'Female', 'Xtra Large', 8, 300),
+	('DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', 'Department Shirt', 'BEED', 'Female', 'Small', 15, 300),
+	('DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', 'Department Shirt', 'BSIT', 'Male', 'Medium', 5, 300),
+	('DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', 'Department Shirt', 'BSHM', 'Male', 'Medium', 4, 300),
+	('DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', 'Department Shirt', 'BSTM', 'Female', 'Large', 6, 300),
+	('DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', 'Department Shirt', 'BSBM', 'Female', 'Medium', 20, 300),
+	('DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', 'Department Shirt', 'BSEE', 'Male', 'Large', 5, 300),
+	('MODULE/Module.png', 'Module', 'Math', '', '', 20, 300),
+	('MODULE/Module.png', 'Module', 'History', '', '', 10, 300),
+	('MODULE/Module.png', 'Module', 'English', '', '', 10, 300),
+	('CAPSTONE_MANUAL/Capstone_Manual.png', 'Capstone Manual', 'Capstone Manual', '', '', 10, 300)
 ;
