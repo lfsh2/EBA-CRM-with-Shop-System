@@ -241,6 +241,50 @@ app.get("/bulletin", (req, res) => {
 });
 
 
+// CALENDAR ENDPOINTS
+app.get("/calendar/events", (req, res) => {
+    const { startDate, endDate } = req.query;
+    let query = "SELECT * FROM bulletin";
+    
+    if (startDate && endDate) {
+        query += " WHERE Date BETWEEN ? AND ?";
+        db.query(query, [startDate, endDate], (err, results) => {
+            if (err) return res.status(500).send(err);
+            res.json(results);
+        });
+    } else {
+        db.query(query, (err, results) => {
+            if (err) return res.status(500).send(err);
+            res.json(results);
+        });
+    }
+});
+
+app.post("/calendar/event", (req, res) => {
+    const { Title, Details, Faculty, FacultyName, Date } = req.body;
+    const query = "INSERT INTO bulletin (Title, Details, Faculty, Faculty_Staff, Date) VALUES (?, ?, ?, ?, ?)";
+    
+    db.query(query, [Title, Details, Faculty, FacultyName, Date], (err, result) => {
+        if (err) {
+            console.error("Error creating event:", err);
+            return res.status(500).json({ Message: "Error creating event" });
+        }
+        return res.json({ Status: "Success", id: result.insertId });
+    });
+});
+
+app.put("/calendar/event/:id", (req, res) => {
+    const { id } = req.params;
+    const { Title, Details, Faculty, FacultyName, Date } = req.body;
+    
+    const query = "UPDATE bulletin SET Title = ?, Details = ?, Faculty = ?, Faculty_Staff = ?, Date = ? WHERE ID = ?";
+    db.query(query, [Title, Details, Faculty, FacultyName, Date, id], (err, result) => {
+        if (err) return res.status(500).send(err);
+        res.json({ message: 'Event updated successfully.' });
+    });
+});
+
+
 // EBA STORE
 // CHECK AND LOGIN THE USER TO ACCESS EBA STORE
 app.post('/userlogin', (req, res) => {
