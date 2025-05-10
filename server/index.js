@@ -23,7 +23,6 @@ const db = mysql.createConnection({
 	database: "capstone",
 });
 
-// CHECK IF CONNECTED TO SERVER AND DATABASE
 app.listen(port, () => {
 	console.log(`Server running on http://localhost:${port}`);
 });
@@ -32,8 +31,7 @@ db.connect((err) => {
 	console.log("Connected to MySQL Database");
 });
 
-// UPLOAD THE IMAGE TO THE PUBLICH FOLDER
-const storage = multer.diskStorage({
+const uploadStorage = multer.diskStorage({
 	destination: (req, file, cb) => {
 		cb(null, 'public/UPLOADS')
 	},
@@ -41,195 +39,17 @@ const storage = multer.diskStorage({
 		cb(null, file.fieldname + '_' + Date.now() + path.extname(file.originalname));
 	}
 })
-const upload = multer({
-	storage: storage
+const itemStorage = multer.diskStorage({
+	destination: (req, file, cb) => {
+		cb(null, 'public/ITEMS')
+	},
+	filename: (req, file, cb) => {
+		cb(null, file.fieldname + '_' + Date.now() + path.extname(file.originalname));
+	}
 })
+const upload = multer({storage: uploadStorage})
+const itemupload = multer({storage: itemStorage})
 
-
-app.get("/api/sales-data", (req, res) => {
-	const query = `
-		SELECT 
-			DATE_FORMAT(Date, '%M') AS month, 
-			Item_Name as category, 
-			SUM(Amount) AS total_sales 
-		FROM transaction 
-		GROUP BY month, Item_Name 
-		ORDER BY MONTH(Date);
-	`;
-  
-	db.query(query, (err, results) => {
-		if (err) {
-			return res.status(500).json({ error: err.message });
-		}
-	
-		const formattedData = {
-			labels: [...new Set(results.map((row) => row.month))], 
-			datasets: [],
-		};
-	
-		const categories = [...new Set(results.map((row) => row.category))];
-	
-		categories.forEach((category) => {
-			formattedData.datasets.push({
-			label: category,
-			data: results
-				.filter((row) => row.category === category)
-				.map((row) => row.total_sales),
-			});
-		});
-	
-		res.json(formattedData);
-	});
-});
-  
-app.get("/api/orders-data", (req, res) => {
-	const query = `
-		SELECT 
-			DATE_FORMAT(Date, '%M') AS month, 
-			Item_Name as category, 
-			COUNT(*) AS total_orders 
-		FROM transaction 
-		GROUP BY month, Item_Name 
-		ORDER BY MONTH(Date);
-	`;
-	
-	db.query(query, (err, results) => {
-		if (err) {
-			return res.status(500).json({ error: err.message });
-		}
-	
-		const formattedData = {
-			labels: [...new Set(results.map((row) => row.month))], 
-			datasets: [],
-		};
-	
-		const categories = [...new Set(results.map((row) => row.category))];
-	
-		categories.forEach((category) => {
-			formattedData.datasets.push({
-			label: category,
-			data: results
-			.filter((row) => row.category === category)
-			.map((row) => row.total_orders),
-			});
-		});
-	
-		res.json(formattedData);
-	});
-});
-
-
-app.get("/api/test/transaction", (req, res) => {
-    db.query("DESCRIBE transaction", (err, result) => {
-        if (err) {
-            console.error("Error describing transaction table:", err);
-            return res.status(500).json({ error: err.message });
-        }
-        res.json(result);
-    });
-});
-
-app.get("/api/dashboard/total-sales", (req, res) => {
-    const query = `
-        SELECT COALESCE(SUM(Amount), 0) as total_sales 
-        FROM transaction
-        WHERE Status IS NULL OR Status != 'Cancelled'
-    `;
-    
-    db.query(query, (err, result) => {
-        if (err) {
-            console.error('Error in total sales query:', err);
-            return res.status(500).json({ error: err.message });
-        }
-        res.json(result[0]);
-    });
-});
-
-app.get("/api/dashboard/total-orders", (req, res) => {
-    const query = `
-        SELECT COUNT(*) as total_orders 
-        FROM transaction
-        WHERE Status IS NULL OR Status != 'Cancelled'
-    `;
-    
-    db.query(query, (err, result) => {
-        if (err) {
-            console.error('Error in total orders query:', err);
-            return res.status(500).json({ error: err.message });
-        }
-        res.json(result[0]);
-    });
-});
-
-app.get("/api/dashboard/low-stock", (req, res) => {
-    const query = `
-        SELECT COUNT(*) as low_stock 
-        FROM inventory 
-        WHERE Quantity < 10 AND Quantity > 0
-    `;
-    
-    db.query(query, (err, result) => {
-        if (err) {
-            console.error('Error in low stock query:', err);
-            return res.status(500).json({ error: err.message });
-        }
-        res.json(result[0]);
-    });
-});
-
-app.get("/api/dashboard/available-stocks", (req, res) => {
-    const query = `
-        SELECT COALESCE(SUM(Quantity), 0) as total_stocks 
-        FROM inventory
-        WHERE Quantity > 0
-    `;
-    
-    db.query(query, (err, result) => {
-        if (err) {
-            console.error('Error in available stocks query:', err);
-            return res.status(500).json({ error: err.message });
-        }
-        res.json(result[0]);
-    });
-});
-
-app.get("/api/dashboard/new-orders", (req, res) => {
-    const query = `
-        SELECT COUNT(*) as new_orders 
-        FROM transaction 
-        WHERE Date >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-        AND (Status IS NULL OR Status != 'Cancelled')
-    `;
-    
-    db.query(query, (err, result) => {
-        if (err) {
-            console.error('Error in new orders query:', err);
-            return res.status(500).json({ error: err.message });
-        }
-        res.json(result[0]);
-    });
-});
-
-app.get("/api/dashboard/fast-moving-items", (req, res) => {
-    const query = `
-        SELECT 
-            Item_Name,
-            COUNT(*) as order_count
-        FROM transaction
-        WHERE Status IS NULL OR Status != 'Cancelled'
-        GROUP BY Item_Name
-        ORDER BY order_count DESC
-        LIMIT 5
-    `;
-    
-    db.query(query, (err, result) => {
-        if (err) {
-            console.error('Error in fast moving items query:', err);
-            return res.status(500).json({ error: err.message });
-        }
-        res.json(result);
-    });
-});
 
 // BULLETIN PAGE
 // DISPLAY EVENT AND ANNOUNCEMENT
@@ -238,50 +58,6 @@ app.get("/bulletin", (req, res) => {
 		if (err) return res.status(500).send(err);
 		res.json(results);
 	});
-});
-
-
-// CALENDAR ENDPOINTS
-app.get("/calendar/events", (req, res) => {
-    const { startDate, endDate } = req.query;
-    let query = "SELECT * FROM bulletin";
-    
-    if (startDate && endDate) {
-        query += " WHERE Date BETWEEN ? AND ?";
-        db.query(query, [startDate, endDate], (err, results) => {
-            if (err) return res.status(500).send(err);
-            res.json(results);
-        });
-    } else {
-        db.query(query, (err, results) => {
-            if (err) return res.status(500).send(err);
-            res.json(results);
-        });
-    }
-});
-
-app.post("/calendar/event", (req, res) => {
-    const { Title, Details, Faculty, FacultyName, Date } = req.body;
-    const query = "INSERT INTO bulletin (Title, Details, Faculty, Faculty_Staff, Date) VALUES (?, ?, ?, ?, ?)";
-    
-    db.query(query, [Title, Details, Faculty, FacultyName, Date], (err, result) => {
-        if (err) {
-            console.error("Error creating event:", err);
-            return res.status(500).json({ Message: "Error creating event" });
-        }
-        return res.json({ Status: "Success", id: result.insertId });
-    });
-});
-
-app.put("/calendar/event/:id", (req, res) => {
-    const { id } = req.params;
-    const { Title, Details, Faculty, FacultyName, Date } = req.body;
-    
-    const query = "UPDATE bulletin SET Title = ?, Details = ?, Faculty = ?, Faculty_Staff = ?, Date = ? WHERE ID = ?";
-    db.query(query, [Title, Details, Faculty, FacultyName, Date, id], (err, result) => {
-        if (err) return res.status(500).send(err);
-        res.json({ message: 'Event updated successfully.' });
-    });
 });
 
 
@@ -647,6 +423,190 @@ app.post('/adminchangepass', async (req, res) => {
 
 
 // DASHBOARD PAGE
+app.get("/api/sales-data", (req, res) => {
+	const query = `
+		SELECT 
+			DATE_FORMAT(Date, '%M') AS month, 
+			Item_Name as category, 
+			SUM(Amount) AS total_sales 
+		FROM transaction 
+		GROUP BY month, Item_Name 
+		ORDER BY MONTH(Date);
+	`;
+  
+	db.query(query, (err, results) => {
+		if (err) {
+			return res.status(500).json({ error: err.message });
+		}
+	
+		const formattedData = {
+			labels: [...new Set(results.map((row) => row.month))], 
+			datasets: [],
+		};
+	
+		const categories = [...new Set(results.map((row) => row.category))];
+	
+		categories.forEach((category) => {
+			formattedData.datasets.push({
+			label: category,
+			data: results
+				.filter((row) => row.category === category)
+				.map((row) => row.total_sales),
+			});
+		});
+	
+		res.json(formattedData);
+	});
+});
+  
+app.get("/api/orders-data", (req, res) => {
+	const query = `
+		SELECT 
+			DATE_FORMAT(Date, '%M') AS month, 
+			Item_Name as category, 
+			COUNT(*) AS total_orders 
+		FROM transaction 
+		GROUP BY month, Item_Name 
+		ORDER BY MONTH(Date);
+	`;
+	
+	db.query(query, (err, results) => {
+		if (err) {
+			return res.status(500).json({ error: err.message });
+		}
+	
+		const formattedData = {
+			labels: [...new Set(results.map((row) => row.month))], 
+			datasets: [],
+		};
+	
+		const categories = [...new Set(results.map((row) => row.category))];
+	
+		categories.forEach((category) => {
+			formattedData.datasets.push({
+			label: category,
+			data: results
+			.filter((row) => row.category === category)
+			.map((row) => row.total_orders),
+			});
+		});
+	
+		res.json(formattedData);
+	});
+});
+
+
+app.get("/api/test/transaction", (req, res) => {
+    db.query("DESCRIBE transaction", (err, result) => {
+        if (err) {
+            console.error("Error describing transaction table:", err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result);
+    });
+});
+
+app.get("/api/dashboard/total-sales", (req, res) => {
+    const query = `
+        SELECT COALESCE(SUM(Amount), 0) as total_sales 
+        FROM transaction
+        WHERE Status IS NULL OR Status != 'Cancelled'
+    `;
+    
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Error in total sales query:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result[0]);
+    });
+});
+
+app.get("/api/dashboard/total-orders", (req, res) => {
+    const query = `
+        SELECT COUNT(*) as total_orders 
+        FROM transaction
+        WHERE Status IS NULL OR Status != 'Cancelled'
+    `;
+    
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Error in total orders query:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result[0]);
+    });
+});
+
+app.get("/api/dashboard/low-stock", (req, res) => {
+    const query = `
+        SELECT COUNT(*) as low_stock 
+        FROM inventory 
+        WHERE Quantity < 10 AND Quantity > 0
+    `;
+    
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Error in low stock query:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result[0]);
+    });
+});
+
+app.get("/api/dashboard/available-stocks", (req, res) => {
+    const query = `
+        SELECT COALESCE(SUM(Quantity), 0) as total_stocks 
+        FROM inventory
+        WHERE Quantity > 0
+    `;
+    
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Error in available stocks query:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result[0]);
+    });
+});
+
+app.get("/api/dashboard/new-orders", (req, res) => {
+    const query = `
+        SELECT COUNT(*) as new_orders 
+        FROM transaction 
+        WHERE Date >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        AND (Status IS NULL OR Status != 'Cancelled')
+    `;
+    
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Error in new orders query:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result[0]);
+    });
+});
+
+app.get("/api/dashboard/fast-moving-items", (req, res) => {
+    const query = `
+        SELECT 
+            Item_Name,
+            COUNT(*) as order_count
+        FROM transaction
+        WHERE Status IS NULL OR Status != 'Cancelled'
+        GROUP BY Item_Name
+        ORDER BY order_count DESC
+        LIMIT 5
+    `;
+    
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Error in fast moving items query:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result);
+    });
+});
 
 
 // TRANSACTION PAGE
@@ -678,15 +638,100 @@ app.delete("/transaction/:id", (req, res) => {
 		res.json({ message: 'Transaction deleted successfully.' });
 	});
 });
+// CONFIRM OR CANCEL ORDER
+app.post('/confirm-order', (req, res) => {
+	const { orderId, name, customerEmail } = req.body;
+
+	const getTransactionQuery = 'SELECT Item_Name, Variant, Size, Quantity FROM transaction WHERE ID = ?';
+
+	db.query(getTransactionQuery, [orderId], (err, transactionResult) => {
+		if (err || transactionResult.length === 0) {
+			return res.status(500).json({ message: 'Failed to retrieve order details' });
+		}
+
+		const { Item_Name, Variant, Size, Quantity } = transactionResult[0];
+
+		const getInventoryQuery = `
+			SELECT Quantity FROM inventory 
+			WHERE Item_Name = ? AND Variant = ? AND Size = ?
+		`;
+
+		db.query(getInventoryQuery, [Item_Name, Variant, Size], (err, inventoryResult) => {
+			if (err || inventoryResult.length === 0) {
+				return res.status(500).json({ message: 'Item not found in inventory' });
+			}
+
+			const currentStock = inventoryResult[0].Quantity;
+
+			if (currentStock < Quantity) {
+				return res.status(400).json({ message: 'This item is out of stock' });
+			}
+
+			const updateInventoryQuery = `
+				UPDATE inventory 
+				SET Quantity = Quantity - ? 
+				WHERE Item_Name = ? AND Variant = ? AND Size = ?
+			`;
+
+			db.query(updateInventoryQuery, [Quantity, Item_Name, Variant, Size], (err, updateResult) => {
+				if (err || updateResult.affectedRows === 0) {
+					return res.status(500).json({ message: 'Failed to update inventory' });
+				}
+
+				db.query('UPDATE transaction SET Status = ? WHERE ID = ?', ['Confirmed', orderId], (err, result) => {
+					if (err) return res.status(500).json({ message: 'Failed to update order status' });
+
+					const mailOptions = {
+						from: 'cvsutanzaeba@gmail.com',
+						to: customerEmail,
+						subject: 'Your Order Has Been Confirmed',
+						text: `Hello ${name}! Your order has been confirmed. We appreciate your purchase!`
+					};
+
+					transporter.sendMail(mailOptions, (error, info) => {
+						if (error) {
+							console.error(error);
+							return res.status(500).json({ message: 'Order confirmed but failed to send email' });
+						}
+
+						res.status(200).json({ message: 'Order confirmed and inventory updated' });
+					});
+				});
+			});
+		});
+	});
+});
+app.post('/cancel-order', (req, res) => {
+	const { orderId, name, customerEmail } = req.body;
+
+	db.query('UPDATE transaction SET Status = ? WHERE ID = ?', ['Cancelled', orderId], (err, result) => {
+		if (err) return res.status(500).json({ message: 'Failed to update order status' });
+
+		const mailOptions = {
+			from: 'cvsutanzaeba@gmail.com',
+			to: customerEmail,
+			subject: 'Your Order Has Been Confirmed',
+			text: `Hello ${name}! Your order has been cancelled. We appreciate your purchase!`
+		};
+
+		transporter.sendMail(mailOptions, (error, info) => {
+			if (error) {
+				console.error(error);
+				return res.status(500).json({ message: 'Failed to send email notification' });
+			}
+			res.status(200).json({ message: 'Order cancelled' });
+		});
+	});
+});
 
 
 // EVENTS & ANNOUNCEMENT PAGE
 // ADD EVENT/ANNOUNCEMENT
 app.post("/announcement", (req, res) => {
-	const { Title, Details, Faculty, FacultyName } = req.body;
+	const { Title, Details, Faculty, FacultyName, announcementDate } = req.body;
 
-	const insertQuery = "INSERT INTO bulletin (Title, Details, Faculty, Faculty_Staff) VALUES (?, ?, ?, ?)";
-	db.query(insertQuery, [Title, Details, Faculty, FacultyName ], (err, result) => {
+	const insertQuery = "INSERT INTO bulletin (Title, Details, Faculty, Faculty_Staff, announcementDate) VALUES (?, ?, ?, ?, ?)";
+	db.query(insertQuery, [Title, Details, Faculty, FacultyName, announcementDate], (err, result) => {
 		if (err) {
 			console.error("Error inserting data:", err);
 			return res.status(500).json({ Message: "Error inserting data" });
@@ -698,10 +743,10 @@ app.post("/announcement", (req, res) => {
 // EDIT EVENT/ANNOUNCEMENT
 app.put("/announcement/:id", (req, res) => {
 	const { id } = req.params;
-	const { title, details, faculty, facultyName } = req.body;
+	const { Title, Details, Faculty, FacultyName, announcementDate } = req.body;
 
-	db.query("UPDATE bulletin SET Title = ?, Details = ?, Faculty = ?, Faculty_Staff = ? WHERE ID = ?",
-		[title, details, faculty, facultyName, id], (err, results) => {
+	db.query("UPDATE bulletin SET Title = ?, Details = ?, Faculty = ?, Faculty_Staff = ?, announcementDate = ? WHERE ID = ?",
+		[Title, Details, Faculty, FacultyName, announcementDate, id], (err, results) => {
 			if (err) return res.status(500).send(err);
 			res.json({ message: 'Announcement updated successfully.' });
 		}

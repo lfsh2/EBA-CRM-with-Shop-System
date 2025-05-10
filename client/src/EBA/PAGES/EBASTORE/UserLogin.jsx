@@ -54,7 +54,6 @@ const UserLogin = () => {
 
 			localStorage.setItem('token', token);
 			
-			// Wait for 3 seconds to show the preloader
 			setTimeout(() => {
 				setLoading(false);
 				navigateTo('/ebastore');
