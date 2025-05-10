@@ -170,7 +170,7 @@
     font-size: 0.8rem;
 }
 
-.modal {
+.date-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -183,7 +183,7 @@
     z-index: 1000;
 }
 
-.modal-content {
+.date-modal-content {
     background: var(--bg-color);
     padding: 20px;
     border-radius: 10px;
@@ -191,14 +191,14 @@
     max-width: 500px;
 }
 
-.modal-header {
+.date-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
 }
 
-.modal-header button {
+.date-modal-header button {
     background: none;
     border: none;
     color: var(--txt-color);

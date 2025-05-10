@@ -9,34 +9,34 @@ import { faChevronLeft, faLocationDot, faChevronRight, faMagnifyingGlass, faMicr
 
 const data = {
 	uniform: [
-		{ name: 'Student Uniform', imgMale: '/MaleUniform.png', imgFemale: '/FemaleUniform.png' },
-		{ name: 'Faculty Uniform', imgMale: '/Faculty.png', imgFemale: '/Faculty.png' },
-		{ name: 'Department Shirt', imgMale: '/Department.png', imgFemale: '/Department.png' }
+		{ name: 'Student Uniform', imgMale: '/ITEMS/STUDENT_UNIFORM/Male_Student_Uniform.png', imgFemale: '/ITEMS/STUDENT_UNIFORM/Female_Student_Uniform.png' },
+		{ name: 'Faculty Uniform', imgMale: '/ITEMS/FACULTY_UNIFORM/Faculty_Uniform.png', imgFemale: '/ITEMS/FACULTY_UNIFORM/Faculty_Uniform.png' },
+		{ name: 'Department Shirt', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' }
 	],
 	student: [
-		{ name: 'Student Uniform', imgMale: '/MaleUniform.png', imgFemale: '/FemaleUniform.png' }
+		{ name: 'Student Uniform', imgMale: '/ITEMS/STUDENT_UNIFORM/Male_Student_Uniform.png', imgFemale: '/ITEMS/STUDENT_UNIFORM/Female_Student_Uniform.png' }
 	],
 	faculty: [
-		{ name: 'Faculty Uniform', imgMale: '/Faculty.png', imgFemale: '/Faculty.png' }
+		{ name: 'Faculty Uniform', imgMale: '/ITEMS/FACULTY_UNIFORM/Faculty_Uniform.png', imgFemale: '/ITEMS/FACULTY_UNIFORM/Faculty_Uniform.png' }
 	],
 	department: [
-		{ name: 'Department Shirt', imgMale: '/Department.png', imgFemale: '/Department.png' }
+		{ name: 'Department Shirt', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' }
 	],
 	module: [
-		{ name: 'Modules', imgMale: '/Book.png' }
+		{ name: 'Modules', imgMale: '/ITEMS/MODULE/Module.png' }
 	],
 	manual: [
-		{ name: 'Capstone Manual', imgMale: '/Book.png' }
+		{ name: 'Capstone Manual', imgMale: '/ITEMS/CAPSTONE_MANUAL/Capstone_Manual.png' }
 	]
 }
 
 const deptShirtTypes = [
-	{ name: 'BSED', imgMale: '/Department.png', imgFemale: '/Department.png' },
-	{ name: 'BSIT', imgMale: '/Department.png', imgFemale: '/Department.png' },
-	{ name: 'BSHM', imgMale: '/Department.png', imgFemale: '/Department.png' },
-	{ name: 'BSTM', imgMale: '/Department.png', imgFemale: '/Department.png' },
-	{ name: 'BSBM', imgMale: '/Department.png', imgFemale: '/Department.png' },
-	{ name: 'BSEE', imgMale: '/Department.png', imgFemale: '/Department.png' },
+	{ name: 'BSED', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' },
+	{ name: 'BSIT', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' },
+	{ name: 'BSHM', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' },
+	{ name: 'BSTM', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' },
+	{ name: 'BSBM', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' },
+	{ name: 'BSEE', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' },
 ]
 
 const Store = () => {
@@ -499,7 +499,7 @@ const Store = () => {
 							<div className="card">
 								<div className="group">
 									<div className="img-block">
-										<img src='/MaleUniform.png' alt="" />
+										<img src='/ITEMS/STUDENT_UNIFORM/Male_Student_Uniform.png' alt="" />
 									</div>
 									<div className="info">
 										<h3>Student Uniform</h3>
@@ -517,7 +517,7 @@ const Store = () => {
 							<div className="card">
 								<div className="group">
 									<div className="img-block">
-										<img src='/Faculty.png' alt="" />
+										<img src='/ITEMS/FACULTY_UNIFORM/Faculty_Uniform.png' alt="" />
 									</div>
 									<div className="info">
 										<h3>Faculty Uniform</h3>
@@ -535,7 +535,7 @@ const Store = () => {
 							<div className="card">
 								<div className="group">
 									<div className="img-block">
-										<img src='/Department.png' alt="" />
+										<img src='/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' alt="" />
 									</div>
 									<div className="info">
 										<h3>Department Shirt</h3>
@@ -553,7 +553,7 @@ const Store = () => {
 							<div className="card">
 								<div className="group">
 									<div className="img-block">
-										<img src='/Book.png' alt="" />
+										<img src='/ITEMS/MODULE/Module.png' alt="" />
 									</div>
 									<div className="info">
 										<h3>Module</h3>
@@ -570,7 +570,7 @@ const Store = () => {
 							<div className="card">
 								<div className="group">
 									<div className="img-block">
-										<img src='/Book.png' alt="" />
+										<img src='/ITEMS/CAPSTONE_MANUAL/Capstone_Manual.png' alt="" />
 									</div>
 									<div className="info">
 										<h3>Capstone Manual</h3>
@@ -594,19 +594,19 @@ const Store = () => {
 						<div className="card-block">
 							<div className="card">
 								<button onClick={() => handleCategoryChange('uniform')}>
-									<img src='/MaleUniform.png' alt="" />
+									<img src='/ITEMS/STUDENT_UNIFORM/Male_Student_Uniform.png' alt="" />
 								</button>
 								<p>Uniforms</p>
 							</div>
 							<div className="card">
 								<button onClick={() => handleCategoryChange('module')}>
-									<img src='/Book.png' alt="" />
+									<img src='/ITEMS/MODULE/Module.png' alt="" />
 								</button>
 								<p>Module</p>
 							</div>
 							<div className="card">
 								<button onClick={() => handleCategoryChange('manual')}>
-									<img src='/Book.png' alt="" />
+									<img src='/ITEMS/CAPSTONE_MANUAL/Capstone_Manual.png' alt="" />
 								</button>
 								<p>Capstone Manual</p>
 							</div>

@@ -36,23 +36,17 @@
 		.card {
 			width: 400px;
 			max-height: 400px;
-			min-height: 400px;
-			height: 100%;
-			padding: 20px;
+            min-height: 400px;
+            height: 100%;
+			padding: 10px;
 			background: var(--bg-color);
 			border-radius: 10px;
 			flex-grow: 1;
 			overflow-y: auto;
 
 			h2 {
-				padding-bottom: 10px;
+				padding-bottom: 5px;
 				border-bottom: 1px solid #acacac;
-				margin-bottom: 20px;
-			}
-
-			canvas {
-				width: 100% !important;
-				height: 300px !important;
 			}
 		}
 	}
@@ -98,6 +92,7 @@
 			align-items: center;
 			gap: 10px;
 			border: 1px solid var(--txt-color);
+			text-align: center;
 		}
 	}
 }
@@ -153,8 +148,7 @@
 		}
 	}
 
-	.table {
-		max-width: 500px !important;
+	table {
 		button {
 			--btn-bg1: #FF9000;
 			--btn-bg2: #4E91F6;
@@ -167,30 +161,31 @@
         display: flex;
         justify-content: space-between;
         flex-direction: column;
-        gap: 30px;
+        gap: 20px;
         
         .detail-block {
             width: 100%;
-            height: 100px;
             display: flex;
             justify-content: space-between;
             align-items: center;
 
             img {
-                height: 100%;
+                height: 100px;
                 object-fit: contain;
                 display: flex;
                 justify-content: start;
             }
             
             .img-block{
-                width: 50%;
+                width: 60%;
                 height: 100%;
             }
 
             p {
-                width: 50%;
+                width: 60%;
+				padding-left: 5px;
                 text-align: left;
+				border-bottom: 1px solid black;
             }
         }
 
@@ -286,6 +281,110 @@
 			}
 		}
 	}
+
+    .date-picker {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: var(--bg-color);
+        color: var(--txt-color);
+    }
+
+    .react-datepicker-wrapper {
+        width: 100%;
+    }
+
+    .react-datepicker__input-container {
+        width: 100%;
+    }
+
+    .react-datepicker {
+        font-family: inherit;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: var(--bg-color);
+    }
+
+    .react-datepicker__header {
+        background-color: #FF9000;
+        color: white;
+    }
+
+    .react-datepicker__current-month,
+    .react-datepicker__day-name {
+        color: white;
+    }
+
+    .react-datepicker__day--selected {
+        background-color: #FF9000;
+        color: white;
+    }
+
+    .react-datepicker__time-container {
+        border-left: 1px solid #ccc;
+    }
+
+    .react-datepicker__time-box {
+        width: 100px !important;
+    }
+
+    .rbc-calendar {
+        background-color: var(--bg-color);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .rbc-header {
+        padding: 10px;
+        background-color: #FF9000;
+        color: white;
+    }
+
+    .rbc-event {
+        background-color: #FF9000;
+        border: none;
+        padding: 4px;
+    }
+
+    .rbc-today {
+        background-color: rgba(255, 144, 0, 0.1);
+    }
+
+    .rbc-toolbar button {
+        color: var(--txt-color);
+        border: 1px solid #ccc;
+        
+        &:hover {
+            background-color: #FF9000;
+            color: white;
+        }
+        
+        &.rbc-active {
+            background-color: #FF9000;
+            color: white;
+        }
+    }
+
+    .rbc-month-view {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .rbc-off-range-bg {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .input-block {
+        margin-bottom: 15px;
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+    }
 }
 
 .inventory {
@@ -308,9 +407,14 @@
 		}
 
 		button {
+			border: none;
+			background: none;
+			font-size: 1rem;
+		}
+
+		.button {
 			background: #FF9000;
 			color: white;
-			border: none;
 		}
 	}
 
@@ -402,16 +506,6 @@
             width: 100px;
         }
     }
-}
-
-.calendar-wrapper {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    background: var(--bg-color);
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 @media screen and (max-width: 992px) {

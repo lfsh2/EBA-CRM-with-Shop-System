@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
-import Date from './Date';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarPlus, faChevronLeft, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import DatePicker from 'react-datepicker';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import 'react-datepicker/dist/react-datepicker.css';
+
+const localizer = momentLocalizer(moment);
 
 const Announcement = () => {
 	const [announcements, setAnnouncements] = useState([]);
@@ -17,12 +21,15 @@ const Announcement = () => {
 	const [message, setMessage] = useState('');
 	
 	const [editAnnouncement, setEditAnnouncement] = useState(null);
-    const [formData, setFormData] = useState({ 
-        Title: '', 
-        Details: '', 
-        Faculty: '', 
-        Faculty_Staff: ''
-    });
+	const [formData, setFormData] = useState({ 
+		title: '', 
+		details: '', 
+		faculty: '', 
+		facultyName: '', 
+		announcementDate: new Date()
+	});
+
+	const [startDate, setStartDate] = useState(new Date());
 
 	const toggleAddAnnouncement = () => {
 		setAddAnnouncement(!addAnnouncement);
@@ -30,7 +37,7 @@ const Announcement = () => {
 
 	useEffect(() => {
 		fetchAnnouncement();
-    }, []);
+	}, []);
 	
 	const fetchAnnouncement = async () => {
 		const response = await axios.get('http://localhost:3000/bulletin');
@@ -44,7 +51,8 @@ const Announcement = () => {
 			Title: title,
 			Details: details,
 			Faculty: faculty,
-			FacultyName: facultyName
+			FacultyName: facultyName,
+			announcementDate: startDate.toISOString()
 		})
 		.then((response) => {
 			if (response.data.Status === "Success") {
@@ -52,6 +60,7 @@ const Announcement = () => {
 				setDetails('');
 				setFaculty('');
 				setFacultyName('');
+				setStartDate(new Date());
 				
 				setAddAnnouncement(null);
 				fetchAnnouncement();
@@ -62,38 +71,42 @@ const Announcement = () => {
 			}
 		})
 	}
-
 	const handleEdit = (announcement) => {
 		setEditAnnouncement(announcement);
 		setFormData({ 
 			title: announcement.Title, 
 			details: announcement.Details, 
 			faculty: announcement.Faculty, 
-			facultyName: announcement.Faculty_Staff
+			facultyName: announcement.Faculty_Staff,
+			announcementDate: announcement.announcementDate ? new Date(announcement.announcementDate) : new Date()
 		});
 	};
-
 	const handleUpdate = async () => {
 		try {
-			const response = await axios.put(`http://localhost:3000/announcement/${editAnnouncement.ID}`, formData);
+			const updatedData = {
+				Title: formData.title,
+				Details: formData.details,
+				Faculty: formData.faculty,
+				FacultyName: formData.facultyName,
+				announcementDate: formData.announcementDate.toISOString()
+			};
+
+			const response = await axios.put(`http://localhost:3000/announcement/${editAnnouncement.ID}`, updatedData);
 
 			if (response.data.Status === "Success") {
-				setAnnouncements(announcements.map(announcement => 
-					announcement.ID === editAnnouncement.ID 
-					? { ...announcement, ...formData } 
-					: announcement
-				));
-			} else {
 				setEditAnnouncement(null);
 				setMessage('Event/Announcement edited successfully');
 				setTimeout(() => {
 					setMessage('');
 				}, 2000);
-
 				fetchAnnouncement();
 			}
 		} catch (err) {
 			console.log(err);
+			setMessage('Failed to update announcement');
+			setTimeout(() => {
+				setMessage('');
+			}, 2000);
 		}
 	};
 
@@ -113,13 +126,40 @@ const Announcement = () => {
 
 		fetchAnnouncement();
 	};
+	const events = announcements.map(announcement => {
+		const eventDate = announcement.announcementDate ? new Date(announcement.announcementDate) : new Date();
+		
+		return {
+			title: announcement.Title,
+			start: eventDate,
+			end: eventDate,
+			allDay: true,
+			desc: announcement.Details,
+			faculty: `${announcement.Faculty} ${announcement.Faculty_Staff}`
+		};
+	});
 
 	return (
 		<div className="admin-content">
 			<h1>Events & Announcement</h1>
 
 			<div className="announcement main-content">
-				<Date />
+				<Calendar
+					localizer={localizer}
+					events={events}
+					startAccessor="start"
+					endAccessor="end"
+					style={{ height: 500, margin: '20px 0' }}
+					views={['month', 'week', 'day']}
+					defaultView='month'
+					tooltipAccessor={(event) => `${event.title}\n${event.desc}\nBy: ${event.faculty}`}
+					popup
+					selectable
+					onSelectEvent={(event) => {
+						setMessage(`${event.title} - ${event.desc}`);
+						setTimeout(() => setMessage(''), 3000);
+					}}
+				/>
 			</div>
 
 			<div className="announcement main-content">
@@ -209,6 +249,22 @@ const Announcement = () => {
 								</div>
 							</div>
 
+							<div className="input-block">
+								<label>Event Date:</label>
+								<DatePicker 
+									selected={startDate} 
+									onChange={(date) => setStartDate(date)}
+									showTimeSelect
+									timeFormat="HH:mm"
+									timeIntervals={15}
+									dateFormat="MMMM d, yyyy h:mm aa"
+									minDate={new Date()}
+									required 
+									className="date-picker"
+									placeholderText="Select date and time"
+								/>
+							</div>
+
 							<button type="submit">Add</button>
 						</form>
 					</div>
@@ -271,6 +327,22 @@ const Announcement = () => {
 										required 
 									/>
 								</div>
+							</div>
+
+							<div className="input-block">
+								<label>Event Date:</label>
+								<DatePicker 
+									selected={new Date(formData.announcementDate)} 
+									onChange={(date) => setFormData({ ...formData, announcementDate: date })}
+									showTimeSelect
+									timeFormat="HH:mm"
+									timeIntervals={15}
+									dateFormat="MMMM d, yyyy h:mm aa"
+									minDate={new Date()}
+									required 
+									className="date-picker"
+									placeholderText="Select date and time"
+								/>
 							</div>
 
 							<button type="button" onClick={handleUpdate}>Edit</button>

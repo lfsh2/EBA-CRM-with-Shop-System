@@ -22,20 +22,16 @@
 
 		const fetchData = async () => {
 			try {
-				// Fetch transactions
 				const responseTransaction = await axios.get('http://localhost:3000/transaction');
 				const transactionsData = responseTransaction.data;
 				setTransactions(transactionsData);
 
-				// Calculate total sales
 				const totalSales = transactionsData.reduce((acc, transaction) => acc + transaction.Amount, 0);
 				setTransactionAmount(totalSales);
 
-				// Calculate total orders
 				const totalOrders = transactionsData.reduce((acc, transaction) => acc + transaction.Quantity, 0);
 				setTransactionQuantity(totalOrders);
 
-				// Calculate new orders this week
 				const oneWeekAgo = new Date();
 				oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 				const newOrders = transactionsData.filter(transaction => 
@@ -43,7 +39,6 @@
 				).length;
 				setNewOrdersThisWeek(newOrders);
 
-				// Calculate fast moving items
 				const itemCounts = transactionsData.reduce((acc, transaction) => {
 					acc[transaction.Item_Name] = (acc[transaction.Item_Name] || 0) + transaction.Quantity;
 					return acc;
@@ -55,14 +50,12 @@
 					.map(([name, count]) => ({ name, count }));
 				setFastMovingItems(fastMoving);
 
-				// Add size abbreviations to transactions
 				const updatedTransactions = transactionsData.map(transaction => ({
 					...transaction,
 					SizeAbbreviation: getSizeAbbreviation(transaction.Size),
 				}));
 				setTransactions(updatedTransactions);
 
-				// Fetch inventory
 				const responseInventory = await axios.get('http://localhost:3000/inventory');
 				const inventoriesData = responseInventory.data.map(inventory => ({
 					...inventory,
@@ -70,11 +63,9 @@
 				}));
 				setInventory(inventoriesData);
 
-				// Calculate total inventory quantity
 				const totalInventory = inventoriesData.reduce((acc, inventory) => acc + inventory.Quantity, 0);
 				setInventoryQuantity(totalInventory);
 
-				// Find low stock items (less than 11 items)
 				const lowStock = inventoriesData.filter(item => item.Quantity < 11);
 				setLowStockItems(lowStock);
 			} catch (error) {

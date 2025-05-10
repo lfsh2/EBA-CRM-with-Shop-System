@@ -14,7 +14,7 @@ const EBA = () => {
 
 	const slides = [
 		{
-			image: '/MaleUniform.png',
+			image: 'ITEMS/STUDENT_UNIFORM/Male_Student_Uniform.png',
 			title: 'Male Uniform',
 			description: "Trying on the campus uniform is made easy with the help of Augmented Reality, you can easily see how the uniform would look while you're wearing it, without the need to wear one physically."
 		},
@@ -68,7 +68,7 @@ const EBA = () => {
 
 					<div className="images">
 						<div className="card">
-							<img src='/MaleUniform.png' />
+							<img src='/ITEMS/STUDENT_UNIFORM/Male_Student_Uniform.png' />
 						</div>
 						<div className="card">
 							<img src='/FemaleUniform.png' />

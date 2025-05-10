@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faClipboardList } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faClipboardList, faRotateRight } from '@fortawesome/free-solid-svg-icons';
 
 const Inventory = () => {
     const [inventories, setInventories] = useState([]);
@@ -191,6 +191,10 @@ const Inventory = () => {
         fetchData();
     };
 
+    const refresh = () => {
+        fetchData();
+    }
+
     return (
         <div className="admin-content">
             <h1>Inventory</h1>
@@ -206,7 +210,7 @@ const Inventory = () => {
                             <option key={index} value={category.Categories}>Category: {category.Categories}</option>
                         ))}
                     </select>
-                    <button onClick={() => setOpenForm(!openForm)}><FontAwesomeIcon icon={faClipboardList} /></button>
+                    <button onClick={() => setOpenForm(!openForm)} className='button'><FontAwesomeIcon icon={faClipboardList} /></button>
                     {openForm && (
                         <div className="modal-container">
                             <div className="modal modals">
@@ -215,6 +219,7 @@ const Inventory = () => {
                             </div>
                         </div>
                     )}
+                    <button><FontAwesomeIcon icon={faRotateRight} onClick={refresh} className='icon' /></button>
                 </div>
 
                 <table>
@@ -237,7 +242,7 @@ const Inventory = () => {
                             <>
                                 {filteredInventories.map(inventory => (
                                     <tr key={inventory.ID}>
-                                        <td><img src={`http://localhost:3000/UPLOADS/${inventory.Image}`} alt="" /></td>
+                                        <td><img src={`http://localhost:3000/ITEMS/${inventory.Image}`} alt="" /></td>
                                         <td>{inventory.Item_Name}</td>
                                         <td>{inventory.Variant || '-'}</td>
                                         <td>{inventory.Size || '-'}</td>
