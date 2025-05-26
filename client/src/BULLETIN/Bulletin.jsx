@@ -35,7 +35,7 @@ const Bulletin = () => {
 						<h3>{bulletin.Title}</h3>
 						<p className="writer">Written by: <span>{bulletin.Faculty} {bulletin.Faculty_Staff}</span></p>
 						<p>{bulletin.Details}</p>
-					</div>
+					</div> 
 				))}
 			</div>
 		</div>

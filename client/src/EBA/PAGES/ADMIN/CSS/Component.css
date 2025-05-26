@@ -428,10 +428,6 @@
 
 
 
-
-
-
-
 .add-new-admin {
 	.top {
 		width: 100%;
@@ -504,6 +500,42 @@
 
         img {
             width: 100px;
+        }
+    }
+}
+
+.pages {
+	.fourth-section {
+        padding: 20px 0;
+		display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        flex-wrap: wrap;
+        gap: 20px;
+    
+        .card {
+            height: 350px;
+            background: #E5F3EA;
+            border: 1px solid #53B175;
+            border-radius: 20px;
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 10px;
+            cursor: pointer;
+            text-decoration: none;
+    
+            img {
+                width: 80%;
+                height: 70%;
+                object-fit: contain;
+            }
+        }
+
+        .name {
+            padding: 0 20px;
+            text-align: center;
         }
     }
 }

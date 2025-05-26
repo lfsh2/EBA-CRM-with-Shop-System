@@ -56,7 +56,7 @@ const Inventory = () => {
         const inventoryResponse = await axios.get('http://localhost:3000/inventory');
         setInventories(inventoryResponse.data);
 
-        const categoryResponse = await axios.get('http://localhost:3000/category');
+        const categoryResponse = await axios.get('http://localhost:3000/exclusive');
         setCategories(categoryResponse.data);
     };
 
@@ -207,15 +207,15 @@ const Inventory = () => {
                     >
                         <option value="All">Category: All</option>
                         {categories.map((category, index) => (
-                            <option key={index} value={category.Categories}>Category: {category.Categories}</option>
+                            <option key={index} value={category.Category}>Category: {category.Category}</option>
                         ))}
                     </select>
                     <button onClick={() => setOpenForm(!openForm)} className='button'><FontAwesomeIcon icon={faClipboardList} /></button>
                     {openForm && (
                         <div className="modal-container">
                             <div className="modal modals">
-                                <button onClick={openUnifShi}>Add Uniform/Shirt</button>
-                                <button onClick={openModMan}>Add Module/Manual</button>
+                                <button onClick={openUnifShi} className='button'>Add Uniform/Shirt</button>
+                                <button onClick={openModMan} className='button'>Add Module/Manual</button>
                             </div>
                         </div>
                     )}
@@ -289,14 +289,14 @@ const Inventory = () => {
 										{categories
 											.filter((category) => {
 												if (selection === 'Module') {
-													return ['Module', 'Capstone Manual'].includes(category.Categories);
+													return ['Module', 'Capstone Manual'].includes(category.Category);
 												} else if (selection === 'Student Uniform') {
-													return ['Student Uniform', 'Faculty Uniform', 'Department Shirt'].includes(category.Categories);
+													return ['Student Uniform', 'Department Shirt', 'Organizational Shirt'].includes(category.Category);
 												}
 												return false
 											})
 											.map((category, index) => (
-                                            <option key={index} value={category.Categories}>{category.Categories}</option>
+                                            <option key={index} value={category.Category}>{category.Category}</option>
                                         ))}
                                     </select>
                                 </div>

@@ -177,7 +177,7 @@ const Transaction = () => {
                                     <tr key={index}>
                                         {table ? (
                                             <>
-                                                <td><img src={transaction.Image} alt="" /></td>
+                                                <td><img src={`http://localhost:3000/ITEMS/${transaction.Image}`} alt="" /></td>
                                                 <td>{transaction.Item_Name}</td>
                                                 <td>{transaction.Variant || '-'}</td>
                                                 <td>{transaction.Size || '-'}</td>
@@ -212,7 +212,7 @@ const Transaction = () => {
                             </div>
 
                             <div className="order">
-                                <div className="detail-block"><label>Image:</label><div className="img-block"><img src={formData.image} alt="" /></div></div>
+                                <div className="detail-block"><label>Image:</label><div className="img-block"><img src={`http://localhost:3000/ITEMS/${formData.image}`} alt="" /></div></div>
                                 <div className="detail-block"><label>Item Name:</label><p>{formData.itemName}</p></div>
                                 <div className="detail-block"><label>Variant:</label><p>{formData.variant}</p></div>
                                 <div className="detail-block"><label>Size:</label><p>{formData.size}</p></div>

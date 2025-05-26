@@ -31,6 +31,7 @@
                 left: 50%;
                 transform: translateX(-50%);
                 z-index: 99;
+                color: black;
             }
 
             h2 {
