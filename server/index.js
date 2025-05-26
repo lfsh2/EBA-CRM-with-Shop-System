@@ -81,6 +81,31 @@ app.post('/userlogin', (req, res) => {
 		})
 	})
 })
+app.get("/exclusive", (req, res) => {
+	db.query("SELECT * FROM exclusive", (err, results) => {
+		if (err) return res.status(500).send(err);
+		res.json(results);
+	});
+});
+app.get("/store", (req, res) => {
+	db.query("SELECT * FROM store", (err, results) => {
+		if (err) return res.status(500).send(err);
+		res.json(results);
+	});
+});
+app.get('/store/:itemId/variant', (req, res) => {
+	const itemId = req.params.itemId;
+
+	db.query(
+		'SELECT * FROM store_variant WHERE Store_ID = ?',
+		[itemId],
+		(err, results) => {
+			if (err) return res.status(500).send(err);
+			res.json(results);
+		}
+	);
+});
+
   
 
 // EBA CART PAGE
@@ -764,12 +789,12 @@ app.delete("/announcement/:id", (req, res) => {
 
 // INVENTORY PAGE
 // FETCH AND DISPLAY THE DATA
-app.get("/category", (req, res) => {
-	db.query("SELECT * FROM categories", (err, results) => {
-		if (err) return res.status(500).send(err);
-		res.json(results);
-	});
-});
+// app.get("/category", (req, res) => {
+// 	db.query("SELECT * FROM categories", (err, results) => {
+// 		if (err) return res.status(500).send(err);
+// 		res.json(results);
+// 	});
+// });
 app.get("/inventory", (req, res) => {
 	db.query("SELECT * FROM inventory", (err, results) => {
 		if (err) return res.status(500).send(err);
@@ -1023,5 +1048,54 @@ app.get("/api/dashboard/all", (req, res) => {
                 res.json(results);
             }
         });
+    });
+});
+app.get("/search", (req, res) => {
+    const { term } = req.query;
+    
+    if (!term || term.trim() === '') {
+        return res.json([]);
+    }
+    
+    const searchTerm = term.toLowerCase();
+    
+    const exclusiveQuery = "SELECT * FROM exclusive WHERE Category LIKE ? OR Item_Name LIKE ?";
+    const storeQuery = "SELECT * FROM store WHERE Category LIKE ? OR Item_Name LIKE ?";
+    const variantQuery = "SELECT sv.*, s.Category, s.Item_Name FROM store_variant sv JOIN store s ON sv.Store_ID = s.ID WHERE sv.Variant LIKE ?";
+    
+    const searchParam = `%${searchTerm}%`;
+    
+    Promise.all([
+        new Promise((resolve, reject) => {
+            db.query(exclusiveQuery, [searchParam, searchParam], (err, results) => {
+                if (err) return reject(err);
+                resolve(results.map(item => ({...item, source: 'exclusive'})));
+            });
+        }),
+        new Promise((resolve, reject) => {
+            db.query(storeQuery, [searchParam, searchParam], (err, results) => {
+                if (err) return reject(err);
+                resolve(results.map(item => ({...item, source: 'store'})));
+            });
+        }),
+        new Promise((resolve, reject) => {
+            db.query(variantQuery, [searchParam], (err, results) => {
+                if (err) return reject(err);
+                resolve(results.map(item => ({...item, source: 'variant'})));
+            });
+        })
+    ])
+    .then(([exclusiveResults, storeResults, variantResults]) => {
+        const combinedResults = [...exclusiveResults, ...storeResults, ...variantResults];
+        
+        const uniqueResults = Array.from(
+            new Map(combinedResults.map(item => [item.ID, item])).values()
+        );
+        
+        res.json(uniqueResults);
+    })
+    .catch(err => {
+        console.error("Search error:", err);
+        res.status(500).json({ error: "Search failed" });
     });
 });

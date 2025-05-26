@@ -12,7 +12,7 @@ const localizer = momentLocalizer(moment);
 
 const Announcement = () => {
 	const [announcements, setAnnouncements] = useState([]);
-	const [addAnnouncement, setAddAnnouncement] = useState('');
+	const [addAnnouncement, setAddAnnouncement] = useState(false);
 	
 	const [title, setTitle] = useState('');
 	const [details, setDetails] = useState('');
@@ -32,7 +32,7 @@ const Announcement = () => {
 	const [startDate, setStartDate] = useState(new Date());
 
 	const toggleAddAnnouncement = () => {
-		setAddAnnouncement(!addAnnouncement);
+		setAddAnnouncement((prev) => !prev);
 	};
 
 	useEffect(() => {
@@ -61,8 +61,8 @@ const Announcement = () => {
 				setFaculty('');
 				setFacultyName('');
 				setStartDate(new Date());
-				
-				setAddAnnouncement(null);
+
+				setAddAnnouncement(false);
 				fetchAnnouncement();
 				setMessage('Event/Announcement added successfully');
 				setTimeout(() => {
@@ -197,7 +197,7 @@ const Announcement = () => {
 				<div className="modal-container">
 					<div className="add-events-announcement modal">
 						<div className="title">
-						<FontAwesomeIcon icon={faChevronLeft} className='icon' onClick={() => setAddAnnouncement(null)}/>
+						<FontAwesomeIcon icon={faChevronLeft} className='icon' onClick={toggleAddAnnouncement}/>
 						<h3>Add Events/Announcement</h3>
 						</div>
 
