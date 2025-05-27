@@ -284,8 +284,8 @@
             overflow-x: auto;
 
             .card {
-                max-width: 300px;
-                width: 300px;
+                max-width: 250px;
+                width: 250px;
                 height: 350px;
                 padding: 10px;
                 border-radius: 20px;
@@ -462,33 +462,6 @@
                     font-size: 1rem;
                     text-align: center;
                 }
-            }
-        }
-    }
-}
-
-
-@media only screen and (min-width: 1200px) {
-    .store {
-        .second-section {
-            /* *{border: 1px solid red !important;} */
-
-            .card-block {
-                width: 80%;
-                margin: auto;
-
-                .card {
-                    max-width: 45%;
-                    width: 100%;
-                }
-            }
-        }
-
-        .fourth-section {
-            grid-template-columns: repeat(2, 1fr);
-
-            .card {
-                height: auto;
             }
         }
     }
