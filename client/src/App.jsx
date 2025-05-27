@@ -14,7 +14,7 @@ import EBACart from './EBA/PAGES/EBASTORE/Cart';
 
 import AdminLogin from './EBA/PAGES/ADMIN/AdminLogin';
 import Adminpanel from './EBA/PAGES/ADMIN/AdminPanel';
-import SuperAdminpanel from './EBA/PAGES/ADMIN/SuperAdminpanel';
+import StaffAdminpanel from './EBA/PAGES/ADMIN/StaffAdminPanel';
 
 import './App.css';
 
@@ -38,8 +38,8 @@ function App() {
 
 				{/* ADMIN PAGE */}
 				<Route path='/adminlogin' element={<AdminLogin />}></Route>
-				<Route path='/superadminpanel' element={<SuperAdminpanel />}></Route>
 				<Route path='/adminpanel' element={<Adminpanel />}></Route>
+				<Route path='/staffadminpanel' element={<StaffAdminpanel />}></Route>
 			</Routes>
 		</BrowserRouter>
 	);

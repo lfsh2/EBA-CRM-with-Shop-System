@@ -52,9 +52,9 @@ const Login = () => {
 		
 			const decodedToken = JSON.parse(atob(token.split('.')[1]));
 			if (decodedToken.role === 'DEAN' || decodedToken.role === 'EBA') {
-				navigateTo('/superadminpanel');
-			} else {
 				navigateTo('/adminpanel');
+			} else {
+				navigateTo('/staffadminpanel');
 			}
 		} catch (err) {
 		  	setMessage('Invalid credentials');

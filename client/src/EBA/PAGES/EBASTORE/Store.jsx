@@ -7,50 +7,33 @@ import './CSS/Store.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faLocationDot, faChevronRight, faMagnifyingGlass, faMicrophone, faPlus, faCartShopping, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
-const data = {
-	uniform: [
-		{ name: 'Student Uniform', imgMale: '/ITEMS/STUDENT_UNIFORM/Male_Student_Uniform.png', imgFemale: '/ITEMS/STUDENT_UNIFORM/Female_Student_Uniform.png' },
-		{ name: 'Faculty Uniform', imgMale: '/ITEMS/FACULTY_UNIFORM/Faculty_Uniform.png', imgFemale: '/ITEMS/FACULTY_UNIFORM/Faculty_Uniform.png' },
-		{ name: 'Department Shirt', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' }
-	],
-	student: [
-		{ name: 'Student Uniform', imgMale: '/ITEMS/STUDENT_UNIFORM/Male_Student_Uniform.png', imgFemale: '/ITEMS/STUDENT_UNIFORM/Female_Student_Uniform.png' }
-	],
-	faculty: [
-		{ name: 'Faculty Uniform', imgMale: '/ITEMS/FACULTY_UNIFORM/Faculty_Uniform.png', imgFemale: '/ITEMS/FACULTY_UNIFORM/Faculty_Uniform.png' }
-	],
-	department: [
-		{ name: 'Department Shirt', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' }
-	],
-	module: [
-		{ name: 'Modules', imgMale: '/ITEMS/MODULE/Module.png' }
-	],
-	manual: [
-		{ name: 'Capstone Manual', imgMale: '/ITEMS/CAPSTONE_MANUAL/Capstone_Manual.png' }
-	]
-}
-
-const deptShirtTypes = [
-	{ name: 'BSED', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' },
-	{ name: 'BSIT', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' },
-	{ name: 'BSHM', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' },
-	{ name: 'BSTM', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' },
-	{ name: 'BSBM', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' },
-	{ name: 'BSEE', imgMale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png', imgFemale: '/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' },
-]
-
 const Store = () => {
-	const [searchTerm, setSearchTerm] = useState('');
-	const [activeCategory, setActiveCategory] = useState('all');
-	const [selectedItem, setSelectedItem] = useState(null);
-	const [showCards, setShowCards] = useState(false);
-	const [showDeptShirt, setShowDeptShirt] = useState(false);
-	const [filteredCategory, setFilteredCategory] = useState('all');
+	const [message, setMessage] = useState('');
+	const [formMessage, setFormMessage] = useState('');
 
 	const [openModal, setOpenModal] = useState(false);
 	const [formHide, setFormHide] = useState(false);
+	
+	const [carts, setCart] = useState([]);
+	const token = localStorage.getItem('token');
+	const navigateTo = useNavigate();
+
+	const [query, setQuery] = useState('');
+	const [results, setResults] = useState([]);
+
+	const [showResult, setShowResult] = useState(false);
+	const [exclusive, setExclusive] = useState([]);
+	const [categories, setCategories] = useState([]);
+	const [items, setItems] = useState([]);
+	const [selectedCategory, setSelectedCategory] = useState(null);
+	const [showSection, setShowSection] = useState(true);
+	const [showCategorySection, setShowCategorySection] = useState(false);
+	const [showVariant, setShowVariant] = useState(false);
+	const [selectedItemId, setSelectedItemId] = useState(null);
+	const [variant, setVariant] = useState([]);
 
 	const [userId, setUserId] = useState('');
+	const [category, setCategory] = useState('');
 	const [image, setImage] = useState();
 	const [itemName, setItemName] = useState('');
 	const [variantName, setVariantName] = useState('');
@@ -59,14 +42,11 @@ const Store = () => {
 	const [fullName, setFullName] = useState('');
 	const [emailAddress, setEmailAddress] = useState('');
 	const [phone, setPhone] = useState('');
-	const [amount, setAmount] = useState('300');
+	const [amount, setAmount] = useState('');
 
-	const [message, setMessage] = useState('');
-	const [formMessage, setFormMessage] = useState('');
-	
-	const [carts, setCart] = useState([]);
-	const token = localStorage.getItem('token');
-	const navigateTo = useNavigate();
+	const filteredItems = selectedCategory
+	? items.filter(item => item.Category === selectedCategory)
+	: [];
 
 	useEffect(() => {
 		if (!token) {
@@ -103,7 +83,110 @@ const Store = () => {
 		
 		navigateTo('/userlogin');
 	};	
+
+	useEffect(() => {
+		fetchExclusive();
+	}, []);
+
+	const fetchExclusive = async () => {
+		const response1 = await axios.get('http://localhost:3000/exclusive');
+		setExclusive(response1.data);
+
+		const response2 = await axios.get('http://localhost:3000/categories');
+		setCategories(response2.data);
+
+		const response3 = await axios.get('http://localhost:3000/store');
+		setItems(response3.data);
+	};
+
+	useEffect(() => {
+		const fetchData = async () => {
+			if (query.trim() === '') {
+				setResults([]);
+				return;
+			}
+
+			try {
+				const res = await axios.get(`http://localhost:3000/search?q=${query}`);
+				setResults(res.data);
+			} catch (err) {
+				console.error('Search failed:', err);
+			}
+		};
+
+		const delayDebounce = setTimeout(() => {
+			fetchData();
+		}, 300);
+
+		return () => clearTimeout(delayDebounce);
+	}, [query]);
+
+	const handleSearch = (e) => {
+		const value = e.target.value
+		setQuery(value)
+
+		if (value === '') {
+			setShowCategorySection(false)
+			setShowSection(true)
+			setShowVariant(false)
+		} else {
+			setShowCategorySection(false)
+			setShowSection(false)
+			setShowVariant(false)
+			setShowResult(true)
+		}
+	}
+
+	useEffect(() => {
+		if (selectedItemId) {
+			axios.get(`http://localhost:3000/store/${selectedItemId}/variant`)
+			.then(res => setVariant(res.data))
+			.catch(err => console.error('Variant fetch error:', err));
+		} else {
+			setVariant([]);
+		}
+	}, [selectedItemId]);
+
+	const handleCategory = (category) => {
+		setSelectedCategory(category)
+		setShowCategorySection(true)
+		setShowSection(false)
+	}
+	const handleVariant = (variant) => {
+		setSelectedItemId(variant.ID)
+
+		if (selectedCategory === 'Capstone Manual' || selectedCategory === 'Module' || variant.Category === 'Capstone Manual' || variant.Category === 'Module') {
+			setOpenModal(true);
+			setFormHide(false);
+			setCategory(variant.Category)
+			setImage(variant.Image)
+			setItemName(variant.Item_Name)
+			setAmount(variant.Price)
+		} else {
+			setShowVariant(true)
+			setShowResult(false)
+			setShowCategorySection(false)
+			setFormHide(true);
+			setCategory(variant.Category)
+			setImage(variant.Image)
+			setItemName(variant.Item_Name)
+			setAmount(variant.Price)
+		}
+	}
+
+	const handleBack = () => {
+		setOpenModal(null)
+		setFormHide(null)
+		setImage()
+		setItemName('')
+		setAmount('')
+	}
 	
+	const handleForm = (item) => {
+		setOpenModal(true);
+		setImage(item.Image)
+		setVariantName(item.Variant)
+	}
 
 	function uniformFormValidation() {
 		if (!itemName || !variantName || !size || !quantity || !fullName || !emailAddress || !phone) {
@@ -121,6 +204,7 @@ const Store = () => {
 		formData.append('transaction', image);
 
 		formData.append('UserID', userId);
+		formData.append('Category', category);
 		formData.append('ItemName', itemName);
 		formData.append('Variant', variantName);
 		formData.append('Size', size);
@@ -176,6 +260,7 @@ const Store = () => {
 		formData.append('transaction', image);
 
 		formData.append('UserID', userId);
+		formData.append('Category', category);
 		formData.append('ItemName', itemName);
 		formData.append('Quantity', quantity);
 		formData.append('CustomerName', fullName);
@@ -211,119 +296,6 @@ const Store = () => {
 		}
 	};
 	
-	useEffect(() => {
-		setActiveCategory(filteredCategory);
-	}, [filteredCategory]);
-	
-	const handleSearch = (event) => {
-	  const term = event.target.value.toLowerCase();
-	  setSearchTerm(term);
-	  setShowCards(term !== '');
-
-	  if (term === '') {
-		setFilteredCategory('all');
-		setSelectedItem(null);
-	} else {
-		const category = Object.keys(data).find(cat => 
-			data[cat].some(item => item.name.toLowerCase(). includes(term))
-		);
-		setFilteredCategory(category || 'all');
-		setSelectedItem(null);
-	  }
-	};
-  
-	const handleCategoryChange = (category) => {
-		setActiveCategory(category);
-		setSearchTerm('');
-		setSelectedItem(null);
-		setShowCards(true);
-		setShowDeptShirt(false);
-		setFilteredCategory(category);
-	};
-	
-	const handleCardClick = (item) => {
-		if (activeCategory === 'module' || activeCategory === 'manual') {
-			setItemName(item.name);
-			setImage(item.imgMale);
-			setOpenModal(true);
-			setFormHide(false);
-		} else if (item.name === 'Department Shirt') {
-			setShowDeptShirt(true);
-			setFormHide(true);
-		} else {
-			setSelectedItem(item);
-			setShowDeptShirt(false);
-			setFormHide(true);
-		}
-	};
-	
-	const handleVariantClick = (variant, itemName, itemImage) => {
-		setVariantName(variant);
-		setItemName(itemName);
-		setImage(itemImage);
-		setOpenModal(true);
-	};
-	  
-	const filterItems = (items) => {
-	  return items.filter(item => item.name.toLowerCase().includes(searchTerm));
-	};
-  
-	const getItemsToDisplay = () => {
-		if (showDeptShirt) {
-			return (
-				<div className="fourth-section">
-					{deptShirtTypes.map((dept, index) => (
-						<div key={index} className="card" onClick={() => handleCardClick(dept)}>
-							<img src={dept.imgMale} alt={dept.name} />
-							<div className="name">
-								<h3>{dept.name}</h3>
-							</div>
-						</div>
-					))}
-				</div>
-			);
-		}
-
-		if (selectedItem) {
-			return (
-				<div className="fourth-section">
-					<div className="card" onClick={() => handleVariantClick('Male', `${selectedItem.name}`, `${selectedItem.imgMale}`)}>
-						<img src={selectedItem.imgMale} alt={`${selectedItem.name} Male`} />
-						<div className="name">
-							<h3>Male</h3>
-						</div>
-					</div>
-					<div className="card" onClick={() => handleVariantClick('Female', `${selectedItem.name}`, `${selectedItem.imgFemale}`)}>
-						<img src={selectedItem.imgFemale} alt={`${selectedItem.name} Female`} />
-						<div className="name">
-							<h3>Female</h3>
-						</div>
-					</div>
-				</div>
-			);
-		}
-
-		const itemsToDisplay = filteredCategory === 'all'
-		? Object.values(data).flat()
-		: data[filteredCategory];
-
-		return (
-			<div className="fourth-section">
-				{filterItems(itemsToDisplay).map((item, index) => (
-					<div key={index} className="card" onClick={() => handleCardClick(item)}>
-						<img src={item.imgMale} alt={item.name} />
-						<div className="name">
-							<h3>{item.name}</h3>
-						</div>
-					</div>
-				))}
-			</div>
-		)
-	}
-
-	const shouldShowBackground = searchTerm === '' && activeCategory === 'all';
-	const shouldShowButtons = searchTerm === '' && activeCategory === 'all';
-
 	return (
 		<div className="store-container">
 			{message && <div className='message'>{message}</div>}
@@ -332,7 +304,7 @@ const Store = () => {
 				<div className="order-container">
 					<div className="order-modal">
 						<div className="title">
-							<FontAwesomeIcon icon={faChevronLeft} className='icon' onClick={() => setOpenModal(null)} />
+							<FontAwesomeIcon icon={faChevronLeft} className='icon' onClick={handleBack} />
 							<h3>Order Form</h3>
 						</div>
 					
@@ -343,11 +315,11 @@ const Store = () => {
 								<div className="input-block">
 									<label>Item: </label>
 									<input
-									type="text"
-									value={itemName}
-									onChange={(e) => setItemName(e.target.value)}
-									placeholder='Enter item name'
-									readOnly
+										type="text"
+										value={itemName}
+										onChange={(e) => setItemName(e.target.value)}
+										placeholder='Enter item name'
+										readOnly
 									/>
 								</div>
 						
@@ -368,11 +340,11 @@ const Store = () => {
 										<div className="input-block">
 											<label>Item Size: </label>
 											<input
-											type="text"
-											value={size}
-											onChange={(e) => setSize(e.target.value)}
-											placeholder='Enter size in centimeters'
-											required
+												type="text"
+												value={size}
+												onChange={(e) => setSize(e.target.value)}
+												placeholder='Enter size in centimeters'
+												required
 											/>
 										</div>
 								
@@ -396,44 +368,44 @@ const Store = () => {
 								<div className="input-block">
 									<label>Name: </label>
 									<input
-									type="text"
-									value={fullName}
-									onChange={(e) => setFullName(e.target.value)}
-									placeholder='Enter your full name'
-									readOnly
+										type="text"
+										value={fullName}
+										onChange={(e) => setFullName(e.target.value)}
+										placeholder='Enter your full name'
+										readOnly
 									/>
 								</div>
 						
 								<div className="input-block">
 									<label>Email Address: </label>
 									<input
-									type="email"
-									value={emailAddress}
-									onChange={(e) => setEmailAddress(e.target.value)}
-									placeholder='Enter your address'
-									readOnly
+										type="email"
+										value={emailAddress}
+										onChange={(e) => setEmailAddress(e.target.value)}
+										placeholder='Enter your address'
+										readOnly
 									/>
 								</div>
 						
 								<div className="input-block">
 									<label>Phone Number: </label>
 									<input
-									type="number"
-									value={phone}
-									onChange={(e) => setPhone(e.target.value)}
-									placeholder='Enter your phone number'
-									required
+										type="number"
+										value={phone}
+										onChange={(e) => setPhone(e.target.value)}
+										placeholder='Enter your phone number'
+										required
 									/>
 								</div>
 						
 								<div className="input-block">
 									<label>Amount: </label>
 									<input
-									type="number"
-									value={amount}
-									onChange={(e) => setAmount(e.target.value)}
-									placeholder='Enter your amount'
-									readOnly
+										type="number"
+										value={amount}
+										onChange={(e) => setAmount(e.target.value)}
+										placeholder='Enter your amount'
+										readOnly
 									/>
 								</div>
 							</div>
@@ -454,25 +426,26 @@ const Store = () => {
 						<a href="/ebastore"><FontAwesomeIcon icon={faChevronLeft} className='icon'/> <h3>EBA Store</h3></a>
 
 						<div className="group">
-							<a href="/ebacart" className='cart'><FontAwesomeIcon icon={faCartShopping} /><span>{carts.length}</span></a>
+							<a href="/ebacart" className='cart'>
+								<FontAwesomeIcon icon={faCartShopping} />
+								<span>{carts.length}</span>
+							</a>
 							<button onClick={handleLogout}><FontAwesomeIcon icon={faArrowRightFromBracket} /></button>
 						</div>
 					</nav>
 					
-					{shouldShowBackground && (
-						<div className="university">
-							<div className="group">
-								<div className="location">
-									<FontAwesomeIcon icon={faLocationDot} className='icon' />
-								</div>
-								<div className="campus">
-									<p>Cavite State University</p>
-									<h4>Tanza Campus</h4>
-								</div>
+					<div className="university">
+						<div className="group">
+							<div className="location">
+								<FontAwesomeIcon icon={faLocationDot} className='icon' />
 							</div>
-							<a href=""><FontAwesomeIcon icon={faChevronRight} className='icon'/></a>
+							<div className="campus">
+								<p>Cavite State University</p>
+								<h4>Tanza Campus</h4>
+							</div>
 						</div>
-					)}
+						<a href=""><FontAwesomeIcon icon={faChevronRight} className='icon'/></a>
+					</div>
 				</header>
 
 				<section className="first-section">
@@ -482,147 +455,100 @@ const Store = () => {
 						name="search" 
 						id="search" 
 						placeholder='Search product' 
-						value={searchTerm}
+						value={query}
 						onChange={handleSearch}
 						required />
 					<FontAwesomeIcon icon={faMicrophone} className='mic' />
 				</section>
 
+				{showSection && (
+					<>
+						<section className="second-section">
+							<div className="top">
+								<h1>Exclusive Offer</h1>
+							</div>
 
-				{shouldShowBackground && (
-					<section className="second-section">
-						<div className="top">
-							<h1>Exclusive Offer</h1>
-						</div>
+							<div className="card-block">
+								{exclusive.map((exclusives, index) => (
+									<div className="card" key={index}>
+										<div className="group">
+											<div className="img-block">
+												<img src={`http://localhost:3000/ITEMS/${exclusives.Image}`} alt="" />
+											</div>
+											<div className="info">
+												<h3>{exclusives.Item_Name}</h3>
+												<p>S, M, L, XL</p>
+											</div>
+										</div>
 
-						<div className="card-block">
-							<div className="card">
-								<div className="group">
-									<div className="img-block">
-										<img src='/ITEMS/STUDENT_UNIFORM/Male_Student_Uniform.png' alt="" />
+										<div className="buttons">
+											<p>Price may vary</p>
+											<button onClick={() => handleCategory(exclusives.Category)}>
+												<FontAwesomeIcon icon={faPlus} />
+											</button>
+										</div>
 									</div>
-									<div className="info">
-										<h3>Student Uniform</h3>
-										<p>S, M, L, XL</p>
-									</div>
-								</div>
+								))}
+							</div>
+						</section>
 
-								<div className="buttons">
-									<p>Price may vary</p>
-									<button onClick={() => handleCategoryChange('student')}>
-										<FontAwesomeIcon icon={faPlus} />
-									</button>
+						<section className="third-section">
+							<h1>Categories</h1>
+							<div className="card-block">
+								{categories.map(categories => (
+									<div className="card">
+										<button 
+										onClick={() => handleCategory(categories.Category)}
+										>
+											<img src={`http://localhost:3000/ITEMS/${categories.Image}`} alt="" />
+										</button>
+										<p>{categories.Category}</p>
+									</div>
+								))}
+							</div>
+						</section>
+					</>
+				)}
+
+				{showCategorySection && (
+					<section className="fourth-section 1">
+						{filteredItems.map(item => (
+							<div className="card" key={item.ID} onClick={() => handleVariant(item)}>
+								<img src={`http://localhost:3000/ITEMS/${item.Image}`} alt="" />
+
+								<div className="name">
+									<h3>{item.Item_Name}</h3>
 								</div>
 							</div>
-							<div className="card">
-								<div className="group">
-									<div className="img-block">
-										<img src='/ITEMS/FACULTY_UNIFORM/Faculty_Uniform.png' alt="" />
-									</div>
-									<div className="info">
-										<h3>Faculty Uniform</h3>
-										<p>S, M, L, XL</p>
-									</div>
-								</div>
-
-								<div className="buttons">
-									<p>Price may vary</p>
-									<button onClick={() => handleCategoryChange('faculty')}>
-										<FontAwesomeIcon icon={faPlus} />
-									</button>
-								</div>
-							</div>
-							<div className="card">
-								<div className="group">
-									<div className="img-block">
-										<img src='/ITEMS/DEPARTMENT_SHIRT/Department_Shirt_BSIT.png' alt="" />
-									</div>
-									<div className="info">
-										<h3>Department Shirt</h3>
-										<p>S, M, L, XL</p>
-									</div>
-								</div>
-
-								<div className="buttons">
-									<p>Price may vary</p>
-									<button onClick={() => handleCategoryChange('department')}>
-										<FontAwesomeIcon icon={faPlus} />
-									</button>
-								</div>
-							</div>
-							<div className="card">
-								<div className="group">
-									<div className="img-block">
-										<img src='/ITEMS/MODULE/Module.png' alt="" />
-									</div>
-									<div className="info">
-										<h3>Module</h3>
-									</div>
-								</div>
-
-								<div className="buttons">
-									<p>Price may vary</p>
-									<button onClick={() => handleCategoryChange('module')}>
-										<FontAwesomeIcon icon={faPlus} />
-									</button>
-								</div>
-							</div>
-							<div className="card">
-								<div className="group">
-									<div className="img-block">
-										<img src='/ITEMS/CAPSTONE_MANUAL/Capstone_Manual.png' alt="" />
-									</div>
-									<div className="info">
-										<h3>Capstone Manual</h3>
-									</div>
-								</div>
-
-								<div className="buttons">
-									<p>Price may vary</p>
-									<button onClick={() => handleCategoryChange('manual')}>
-										<FontAwesomeIcon icon={faPlus} />
-									</button>
-								</div>
+						))}
+					</section>
+				)}
+				{showVariant && (
+					<section className="fourth-section 2">
+						{variant.map((variants, index) => (
+						<div className="card" key={index} onClick={() => handleForm(variants)}>
+							<img src={`http://localhost:3000/ITEMS/${variants.Image}`} alt="" />
+							<div className="name">
+								<h3>{variants.Variant}</h3>
 							</div>
 						</div>
+						))}
 					</section>
 				)}
 
-				{shouldShowButtons && (
-					<section className="third-section">
-						<h1>Categories</h1>
-						<div className="card-block">
-							<div className="card">
-								<button onClick={() => handleCategoryChange('uniform')}>
-									<img src='/ITEMS/STUDENT_UNIFORM/Male_Student_Uniform.png' alt="" />
-								</button>
-								<p>Uniforms</p>
+				{showResult && (
+					<div className="fourth-section 3">
+						{results.map((result, index) => (
+							<div className="card" key={index} onClick={() => handleVariant(result)}>
+								<img src={`http://localhost:3000/ITEMS/${result.Image}`} alt="" />
+
+								<div className="name">
+									<h3>{result.Item_Name}</h3>
+								</div>
 							</div>
-							<div className="card">
-								<button onClick={() => handleCategoryChange('module')}>
-									<img src='/ITEMS/MODULE/Module.png' alt="" />
-								</button>
-								<p>Module</p>
-							</div>
-							<div className="card">
-								<button onClick={() => handleCategoryChange('manual')}>
-									<img src='/ITEMS/CAPSTONE_MANUAL/Capstone_Manual.png' alt="" />
-								</button>
-								<p>Capstone Manual</p>
-							</div>
-							<div className="card">
-								<button>
-									<img src='/Printer.png' alt="" />
-								</button>
-								<p>Printing Service</p>
-							</div>
-						</div>
-					</section>
+						))}
+					</div>
 				)}
-				
-				<div>
-					{showCards && getItemsToDisplay()}
-				</div>
 			</div>
 		</div>
 	)

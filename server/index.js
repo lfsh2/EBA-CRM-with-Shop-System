@@ -81,6 +81,46 @@ app.post('/userlogin', (req, res) => {
 		})
 	})
 })
+app.get("/exclusive", (req, res) => {
+	db.query("SELECT * FROM exclusive", (err, results) => {
+		if (err) return res.status(500).send(err);
+		res.json(results);
+	});
+});
+app.get("/categories", (req, res) => {
+	db.query("SELECT * FROM categories", (err, results) => {
+		if (err) return res.status(500).send(err);
+		res.json(results);
+	});
+});
+app.get('/search', (req, res) => {
+	const search = req.query.q;
+	const sql = `SELECT * FROM store WHERE Item_Name LIKE ?`;
+
+	db.query(sql, [`%${search}%`], (err, results) => {
+		if (err) return res.status(500).json({ error: err.message });
+		res.json(results);
+	});
+});
+app.get("/store", (req, res) => {
+	db.query("SELECT * FROM store", (err, results) => {
+		if (err) return res.status(500).send(err);
+		res.json(results);
+	});
+});
+app.get('/store/:itemId/variant', (req, res) => {
+	const itemId = req.params.itemId;
+
+	db.query(
+		'SELECT * FROM store_variant WHERE Store_ID = ?',
+		[itemId],
+		(err, results) => {
+			if (err) return res.status(500).send(err);
+			res.json(results);
+		}
+	);
+});
+
   
 
 // EBA CART PAGE
@@ -114,6 +154,7 @@ app.get("/cartItem", verifyToken, (req, res) => {
 app.post("/addOrderUniform", upload.single('transaction'), (req, res) => {
 	const {
 		UserID,
+		Category,
 		transaction,
 		ItemName,
 		Variant = '',
@@ -129,7 +170,7 @@ app.post("/addOrderUniform", upload.single('transaction'), (req, res) => {
 			WHERE User_ID = ? AND Item_Name = ? AND Variant = ? AND Size = ?
 		`;
 
-		let checkParams = [UserID, ItemName, Variant, Size];
+		let checkParams = [UserID, Category, ItemName, Variant, Size];
 
 		db.query(checkQuery, checkParams, (err, results) => {
 			if (err) {
@@ -144,7 +185,7 @@ app.post("/addOrderUniform", upload.single('transaction'), (req, res) => {
 				let updateQuery = `
 					UPDATE item_cart 
 					SET Quantity = ? 
-					WHERE User_ID = ? AND Item_Name = ? AND Variant = ? AND Size = ?
+					WHERE User_ID = ? AND Category = ? AND Item_Name = ? AND Variant = ? AND Size = ?
 				`;
 
 				let updateParams = [newQuantity, UserID, ItemName, Variant, Size];
@@ -160,12 +201,13 @@ app.post("/addOrderUniform", upload.single('transaction'), (req, res) => {
 			} else {
 				let insertQuery = `
 					INSERT INTO item_cart 
-					(User_ID, Image, Item_Name, Variant, Size, Quantity, Amount, Phone_Number) 
-					VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+					(User_ID, Category, Image, Item_Name, Variant, Size, Quantity, Amount, Phone_Number) 
+					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 				`;
 
 				let values = [
 					UserID,
+					Category,
 					transaction,
 					ItemName,
 					Variant || '',
@@ -423,6 +465,106 @@ app.post('/adminchangepass', async (req, res) => {
 
 
 // DASHBOARD PAGE
+app.get("/api/dashboard/all", (req, res) => {
+    const queries = {
+        totalSales: `
+            SELECT COALESCE(SUM(Amount), 0) as total_sales 
+            FROM transaction
+            WHERE Status IS NULL OR Status != 'Cancelled'
+        `,
+        totalOrders: `
+            SELECT COUNT(*) as total_orders 
+            FROM transaction
+            WHERE Status IS NULL OR Status != 'Cancelled'
+        `,
+        lowStock: `
+            SELECT COUNT(*) as low_stock 
+            FROM inventory 
+            WHERE Quantity < 10 AND Quantity > 0
+        `,
+        availableStocks: `
+            SELECT COALESCE(SUM(Quantity), 0) as total_stocks 
+            FROM inventory
+            WHERE Quantity > 0
+        `,
+        newOrders: `
+            SELECT COUNT(*) as new_orders 
+            FROM transaction 
+            WHERE Date >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+            AND (Status IS NULL OR Status != 'Cancelled')
+        `,
+        fastMovingItems: `
+            SELECT 
+                Item_Name,
+                COUNT(*) as order_count
+            FROM transaction
+            WHERE Status IS NULL OR Status != 'Cancelled'
+            GROUP BY Item_Name
+            ORDER BY order_count DESC
+            LIMIT 5
+        `,
+        salesData: `
+            SELECT 
+                DATE_FORMAT(Date, '%M') AS month, 
+                Item_Name as category, 
+                SUM(Amount) AS total_sales 
+            FROM transaction 
+            WHERE Status IS NULL OR Status != 'Cancelled'
+            GROUP BY month, Item_Name 
+            ORDER BY MONTH(Date)
+        `,
+        ordersData: `
+            SELECT 
+                DATE_FORMAT(Date, '%M') AS month, 
+                Item_Name as category, 
+                COUNT(*) AS total_orders 
+            FROM transaction 
+            WHERE Status IS NULL OR Status != 'Cancelled'
+            GROUP BY month, Item_Name 
+            ORDER BY MONTH(Date)
+        `
+    };
+
+    const results = {};
+    let completedQueries = 0;
+    const totalQueries = Object.keys(queries).length;
+
+    Object.entries(queries).forEach(([key, query]) => {
+        db.query(query, (err, result) => {
+            if (err) {
+                console.error(`Error in ${key} query:`, err);
+                return res.status(500).json({ error: err.message });
+            }
+
+            if (key === 'salesData' || key === 'ordersData') {
+                const formattedData = {
+                    labels: [...new Set(result.map((row) => row.month))],
+                    datasets: []
+                };
+
+                const categories = [...new Set(result.map((row) => row.category))];
+
+                categories.forEach((category) => {
+                    formattedData.datasets.push({
+                        label: category,
+                        data: result
+                            .filter((row) => row.category === category)
+                            .map((row) => key === 'salesData' ? row.total_sales : row.total_orders)
+                    });
+                });
+
+                results[key] = formattedData;
+            } else {
+                results[key] = result[0];
+            }
+
+            completedQueries++;
+            if (completedQueries === totalQueries) {
+                res.json(results);
+            }
+        });
+    });
+});
 app.get("/api/sales-data", (req, res) => {
 	const query = `
 		SELECT 
@@ -764,12 +906,6 @@ app.delete("/announcement/:id", (req, res) => {
 
 // INVENTORY PAGE
 // FETCH AND DISPLAY THE DATA
-app.get("/category", (req, res) => {
-	db.query("SELECT * FROM categories", (err, results) => {
-		if (err) return res.status(500).send(err);
-		res.json(results);
-	});
-});
 app.get("/inventory", (req, res) => {
 	db.query("SELECT * FROM inventory", (err, results) => {
 		if (err) return res.status(500).send(err);
@@ -777,7 +913,7 @@ app.get("/inventory", (req, res) => {
 	});
 });
 // ADD INVENTORY
-app.post("/inventory", upload.single('inventory'), (req, res) => {
+app.post("/inventory", itemupload.single('inventory'), (req, res) => {
 	const image = req.file.filename;
 	const { Category, ItemName, Variant, Size, Quantity, Price } = req.body;
 	const insertQuery = "INSERT INTO inventory (Image, Category, Item_Name, Variant, Size, Quantity, Price) VALUES ( ?, ?, ?, ?, ?, ?, ?)";
@@ -792,7 +928,7 @@ app.post("/inventory", upload.single('inventory'), (req, res) => {
 	});
 });
 // EDIT INVENTORY
-app.put("/inventory/:id", upload.single('inventory'), (req, res) => {
+app.put("/inventory/:id", itemupload.single('inventory'), (req, res) => {
 	const { id } = req.params;
 
 	let image = null;
@@ -925,103 +1061,79 @@ app.delete("/addnewadmin/:id", (req, res) => {
 	});
 });
 
-app.get("/api/dashboard/all", (req, res) => {
-    const queries = {
-        totalSales: `
-            SELECT COALESCE(SUM(Amount), 0) as total_sales 
-            FROM transaction
-            WHERE Status IS NULL OR Status != 'Cancelled'
-        `,
-        totalOrders: `
-            SELECT COUNT(*) as total_orders 
-            FROM transaction
-            WHERE Status IS NULL OR Status != 'Cancelled'
-        `,
-        lowStock: `
-            SELECT COUNT(*) as low_stock 
-            FROM inventory 
-            WHERE Quantity < 10 AND Quantity > 0
-        `,
-        availableStocks: `
-            SELECT COALESCE(SUM(Quantity), 0) as total_stocks 
-            FROM inventory
-            WHERE Quantity > 0
-        `,
-        newOrders: `
-            SELECT COUNT(*) as new_orders 
-            FROM transaction 
-            WHERE Date >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-            AND (Status IS NULL OR Status != 'Cancelled')
-        `,
-        fastMovingItems: `
-            SELECT 
-                Item_Name,
-                COUNT(*) as order_count
-            FROM transaction
-            WHERE Status IS NULL OR Status != 'Cancelled'
-            GROUP BY Item_Name
-            ORDER BY order_count DESC
-            LIMIT 5
-        `,
-        salesData: `
-            SELECT 
-                DATE_FORMAT(Date, '%M') AS month, 
-                Item_Name as category, 
-                SUM(Amount) AS total_sales 
-            FROM transaction 
-            WHERE Status IS NULL OR Status != 'Cancelled'
-            GROUP BY month, Item_Name 
-            ORDER BY MONTH(Date)
-        `,
-        ordersData: `
-            SELECT 
-                DATE_FORMAT(Date, '%M') AS month, 
-                Item_Name as category, 
-                COUNT(*) AS total_orders 
-            FROM transaction 
-            WHERE Status IS NULL OR Status != 'Cancelled'
-            GROUP BY month, Item_Name 
-            ORDER BY MONTH(Date)
-        `
-    };
+// MANAGE PAGES
+app.put("/exclusive/:id", itemupload.single('store'), (req, res) => {
+	const { id } = req.params;
 
-    const results = {};
-    let completedQueries = 0;
-    const totalQueries = Object.keys(queries).length;
+	let image = null;
+	if (req.file) {
+		image = req.file.filename;
+	}	
+	const { itemName } = req.body;
 
-    Object.entries(queries).forEach(([key, query]) => {
-        db.query(query, (err, result) => {
-            if (err) {
-                console.error(`Error in ${key} query:`, err);
-                return res.status(500).json({ error: err.message });
-            }
+	if (image) {
+		db.query("UPDATE exclusive SET Image = ?, Item_Name = ? WHERE ID = ?",
+			[image, itemName, id], (err, results) => {
+				if (err) return res.status(500).send(err);
+				res.json({ message: 'Item updated successfully.' });
+			}
+		);
+	} else {
+		db.query("UPDATE exclusive SET Item_Name = ? WHERE ID = ?",
+			[itemName, id], (err, results) => {
+				if (err) return res.status(500).send(err);
+				res.json({ message: 'Item updated successfully.' });
+			}
+		);
+	}
+});
+app.put("/categories/:id", itemupload.single('store'), (req, res) => {
+	const { id } = req.params;
 
-            if (key === 'salesData' || key === 'ordersData') {
-                const formattedData = {
-                    labels: [...new Set(result.map((row) => row.month))],
-                    datasets: []
-                };
+	let image = null;
+	if (req.file) {
+		image = req.file.filename;
+	}	
+	const { itemName } = req.body;
 
-                const categories = [...new Set(result.map((row) => row.category))];
+	if (image) {
+		db.query("UPDATE categories SET Image = ?, Item_Name = ? WHERE ID = ?",
+			[image, itemName, id], (err, results) => {
+				if (err) return res.status(500).send(err);
+				res.json({ message: 'Item updated successfully.' });
+			}
+		);
+	} else {
+		db.query("UPDATE categories SET Item_Name = ? WHERE ID = ?",
+			[itemName, id], (err, results) => {
+				if (err) return res.status(500).send(err);
+				res.json({ message: 'Item updated successfully.' });
+			}
+		);
+	}
+});
+app.put("/store/:id", itemupload.single('store'), (req, res) => {
+	const { id } = req.params;
 
-                categories.forEach((category) => {
-                    formattedData.datasets.push({
-                        label: category,
-                        data: result
-                            .filter((row) => row.category === category)
-                            .map((row) => key === 'salesData' ? row.total_sales : row.total_orders)
-                    });
-                });
+	let image = null;
+	if (req.file) {
+		image = req.file.filename;
+	}	
+	const { itemName, price } = req.body;
 
-                results[key] = formattedData;
-            } else {
-                results[key] = result[0];
-            }
-
-            completedQueries++;
-            if (completedQueries === totalQueries) {
-                res.json(results);
-            }
-        });
-    });
+	if (image) {
+		db.query("UPDATE store SET Image = ?, Item_Name = ?, Price = ? WHERE ID = ?",
+			[image, itemName, price, id], (err, results) => {
+				if (err) return res.status(500).send(err);
+				res.json({ message: 'Item updated successfully.' });
+			}
+		);
+	} else {
+		db.query("UPDATE store SET Item_Name = ?, Price = ? WHERE ID = ?",
+			[itemName, price, id], (err, results) => {
+				if (err) return res.status(500).send(err);
+				res.json({ message: 'Item updated successfully.' });
+			}
+		);
+	}
 });

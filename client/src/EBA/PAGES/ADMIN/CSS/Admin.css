@@ -4,6 +4,8 @@
 	--txt-color: #000000;
 	--btn-bg: #E0B5FF;
 	--shadow: #6e6e6e;
+	--card-border: #53B175;
+	--card-bg: #E5F3EA;
 }
 .dark-mode {
 	--bg-color: #141516;
@@ -13,16 +15,47 @@
 	--shadow: #6e6e6e;
 	--invert: 1;
 	--brightness: 2;
+	--card-border: #53B175;
+	--card-bg: #25362b;
 }
 
 * {
 	scrollbar-width: none;
 }
 
+.changepass {
+	.input-block {
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+
+		label, input {
+			color: var(--txt-color);
+		}
+		input::placeholder, textarea::placeholder {
+			color: var(--txt-color);
+		}
+
+		input {
+			padding: 10px;
+			background: var(--bg-color);
+			border-radius: 5px;
+			border: 1px solid var(--txt-color);
+			outline: none;
+		}
+
+		input[type="number"]::-webkit-outer-spin-button,
+		input[type="number"]::-webkit-inner-spin-button {
+			-webkit-appearance: none;
+		}
+	}
+}
+
 .adminpanel {
 	width: 100%;
 	height: 100vh;
 	background: var(--main-bg);
+	overflow-y: hidden;
 
 	h1 {
 		color: var(--txt-color);
@@ -300,15 +333,17 @@
 		}
 	}
 
-	.message {
+	.messages {
 		padding: 10px 20px;
+		color: var(--txt-color);
 		background: var(--bg-color);
 		box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 		border-radius: 10px;
-		position: absolute;
+		position: fixed;
 		bottom: 30px;
 		left: 60%;
 		transform: translateX(-50%);
+		text-align: center;
 		z-index: 99;
 	}
 
@@ -317,149 +352,185 @@
 		text-align: center;
 	}
 
-	.modal-container {
-		width: 100%;
-		height: 100vh;
-		padding: 10px;
-		background: rgba(0, 0, 0, 0.5);
+}
+
+.confirmation {
+	min-width: 200px;
+	padding: 20px;
+	border-radius: 20px;
+	background: white;
+	text-align: center;
+
+	.btn {
+		padding-top: 10px;
 		display: flex;
 		justify-content: center;
-		align-items: center;
-		position: absolute;
-		top: 0;
-		left: 0;
-		z-index: 99;
-		overflow: hidden;
+		gap: 20px;
+
+		button {
+			padding: 10px 20px;
+			background: var(--confirm);
+			border: none;
+			border-radius: 10px;
+			color: white;
+			cursor: pointer;
+		}
+
+		button:nth-child(1) {
+			--confirm: #4E91F6;
+		}
+		button:nth-child(2) {
+			--confirm: red;
+		}
+	}
+}
+
+.modal-container {
+	width: 100%;
+	height: 100vh;
+	padding: 10px;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 99;
+	overflow: hidden;
+	
+	.modals button {
+		width: 80%;
+		margin: auto;
+	}
+}
+
+.modal {
+	max-width: 600px;
+	width: 100%;
+	height: auto;
+	padding: 20px;
+	border-radius: 20px;
+	background: var(--bg-color);
+	color: var(--txt-color);
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+	gap: 30px;;
+	
+	.title {
+		width: 100%;
+		text-align: center;
+		position: relative;
+
+		.icon {
+			position: absolute;
+			top: 50%;
+			left: 0;
+			transform: translateY(-50%);
+			cursor: pointer;
+		}
 		
-		.modals button {
-			width: 80%;
-			margin: auto;
+		button {
+			width: 50px;
+			padding: 5px;
+			font-size: 1rem;
+			background: #FF9000;
+			border-radius: 5px;
+			color: white;
+			border: none;
+			cursor: pointer;
+			position: absolute;
+			top: 50%;
+			right: 0;
+			transform: translateY(-50%);
+		}
+
+		.inventory {
+			width: 100px;
 		}
 	}
 
-	.modal {
-		max-width: 600px;
+	p {
+		text-align: center;
+		font-size: 0.9rem;
+	}
+
+	form {
 		width: 100%;
-		height: auto;
-		padding: 20px;
-		border-radius: 20px;
-		background: var(--bg-color);
-		color: var(--txt-color);
 		display: flex;
-		justify-content: space-between;
+		justify-content: start;
 		flex-direction: column;
-		gap: 30px;
+		gap: 20px;
 		
-		.title {
-			width: 100%;
-			text-align: center;
-			position: relative;
-
-			.icon {
-				position: absolute;
-				top: 50%;
-				left: 0;
-				transform: translateY(-50%);
-				cursor: pointer;
-			}
-			
-			button {
-				width: 50px;
-				padding: 5px;
-				font-size: 1rem;
-				background: #FF9000;
-				border-radius: 5px;
-				color: white;
-				border: none;
-				cursor: pointer;
-				position: absolute;
-				top: 50%;
-				right: 0;
-				transform: translateY(-50%);
-			}
-
-			.inventory {
-				width: 100px;
-			}
-		}
-
-		p {
-			text-align: center;
-			font-size: 0.9rem;
-		}
-
-		form {
+		.input-block {
 			width: 100%;
 			display: flex;
-			justify-content: start;
-			flex-direction: column;
-			gap: 20px;
-			
-			.input-block {
-				width: 100%;
-				display: flex;
-				justify-content: space-between;
+			justify-content: space-between;
 
-				label, input, select, textarea {
-					width: 50%;
-					color: var(--txt-color);
-				}
-				input::placeholder, textarea::placeholder {
-					color: var(--txt-color);
-				}
-
-				input, select, textarea {
-					padding: 10px;
-					background: var(--bg-color);
-					border-radius: 5px;
-					border: 1px solid var(--txt-color);
-					outline: none;
-				}
-
-				input[type="number"]::-webkit-outer-spin-button,
-				input[type="number"]::-webkit-inner-spin-button {
-					-webkit-appearance: none;
-				}
-
-				select {
-					cursor: pointer;
-				}
-
-				textarea {
-					height: 150px;
-					resize: none;
-				}
-			}
-
-			.group {
+			label, input, select, textarea, .react-datepicker-wrapper {
 				width: 50%;
-				display: flex;
-				gap: 10px;
-
-				select {
-					width: 25%;
-				}
-
-				input {
-					flex-grow: 1;
-				}
+				color: var(--txt-color);
+			}
+			input::placeholder, textarea::placeholder {
+				color: var(--txt-color);
 			}
 
-			button {
-				min-width: 100px;
-				padding: 10px 5px;
-				margin: 0 auto;
-				background: #FF9000;
-				color: white;
-				border: none;
+			input, select, textarea {
+				padding: 10px;
+				background: var(--bg-color);
 				border-radius: 5px;
-				cursor: pointer;
-				transition: all 500ms;
+				border: 1px solid var(--txt-color);
+				outline: none;
 			}
 
-			button:hover {
-				background: color-mix(in srgb, #FF9000, black 5%);
+			input[type="number"]::-webkit-outer-spin-button,
+			input[type="number"]::-webkit-inner-spin-button {
+				-webkit-appearance: none;
 			}
+
+			select {
+				cursor: pointer;
+			}
+
+			textarea {
+				height: 150px;
+				resize: none;
+			}
+
+			.react-datepicker-wrapper input {
+				width: 100%;
+			}
+		}
+
+		.group {
+			width: 50%;
+			display: flex;
+			gap: 10px;
+
+			select {
+				width: 25%;
+			}
+
+			input {
+				flex-grow: 1;
+			}
+		}
+
+		button {
+			min-width: 100px;
+			padding: 10px 5px;
+			margin: 0 auto;
+			background: #FF9000;
+			color: white;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			transition: all 500ms;
+		}
+
+		button:hover {
+			background: color-mix(in srgb, #FF9000, black 5%);
 		}
 	}
 }

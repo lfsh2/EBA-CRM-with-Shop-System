@@ -45,7 +45,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		position: absolute;
+		position: fixed;
 		top: 0;
 		left: 0;
 		z-index: 8;
@@ -268,20 +268,24 @@
             right: 20px;
         }
     }
-
+    
     .second-section {
         width: 100%;
-
+        
         .top {
             padding: 10px 0;
         }
         .card-block {
             width: 100%;
             display: flex;
+            justify-content: center;
             gap: 10px;
+            flex-wrap: wrap;
+            overflow-x: auto;
 
             .card {
-                    width: 500px;
+                max-width: 300px;
+                width: 300px;
                 height: 350px;
                 padding: 10px;
                 border-radius: 20px;
@@ -307,6 +311,10 @@
                     .info {
                         width: 100%;
                         padding: 10px 0;
+
+                        h3 {
+                            word-wrap: break-word;
+                        }
                     }
                 }
 
@@ -378,16 +386,13 @@
         }
     }
     .fourth-section {
-        width: 100%;
         padding: 20px 0;
-		display: flex;
-        justify-content: start;
+		display: grid;
+        grid-template-columns: repeat(3, 1fr);
         flex-wrap: wrap;
         gap: 20px;
     
         .card {
-            max-width: 32%;
-            width: 100%;
             height: 350px;
             background: #E5F3EA;
             border: 1px solid #53B175;
@@ -407,39 +412,24 @@
                 object-fit: contain;
             }
         }
+
+        .name {
+            padding: 0 20px;
+            text-align: center;
+        }
+    }
+    .no {
+        width: 100%;
+        height: 50vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 }
 
 @media screen and (max-width: 992px) {
     .store {
         width: 100%;
-        
-        .second-section {
-            .card-block {
-                width: 100%;
-                height: 45vh;
-                gap: 20px;
-                white-space: nowrap;
-                overflow-x: auto;
-                scrollbar-width: none;
-
-                .card {
-					width: 500px;
-                    height: 100%;
-                    justify-content: space-between;
-
-                    .img-block {
-                        height: 60%;
-                    }
-
-                    .info, .buttons {
-                        p {
-                            font-size: 0.8rem;
-                        }
-                    }
-                }
-            }
-        }
 
         .third-section {
             .card-block {
@@ -463,16 +453,42 @@
         .fourth-section {
             padding: 0;
             gap: 10px;
+            grid-template-columns: repeat(2, 1fr);
 
             .card {
-                max-width: 48%;
-                width: 100%;
                 height: 250px;
 
                 h3 {
                     font-size: 1rem;
                     text-align: center;
                 }
+            }
+        }
+    }
+}
+
+
+@media only screen and (min-width: 1200px) {
+    .store {
+        .second-section {
+            /* *{border: 1px solid red !important;} */
+
+            .card-block {
+                width: 80%;
+                margin: auto;
+
+                .card {
+                    max-width: 45%;
+                    width: 100%;
+                }
+            }
+        }
+
+        .fourth-section {
+            grid-template-columns: repeat(2, 1fr);
+
+            .card {
+                height: auto;
             }
         }
     }

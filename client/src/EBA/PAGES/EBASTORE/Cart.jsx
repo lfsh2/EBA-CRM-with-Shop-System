@@ -126,7 +126,7 @@ const Cart = () => {
                             {carts.map((cart, index) => (
                                 <div className="item" key={index}>
                                     <div className="info-blocks">
-                                        <img src={`http://localhost:3000/${cart.Image}`} alt="" />
+                                        <img src={`http://localhost:3000/ITEMS/${cart.Image}`} alt="" />
 
                                         <div className="info">
                                             <p className='th'>{cart.Item_Name}</p>
@@ -136,7 +136,7 @@ const Cart = () => {
                                     </div>
 
                                     <div className="info-block text">
-                                        {cart.Item_Name !== 'Modules' && cart.Item_Name !== 'Capstone Manual' && (
+                                        {cart.Category !== 'Module' && cart.Category !== 'Capstone Manual' && (
                                             <div className="info">
                                                 <p className="th">Size</p>
                                                 <p className="td">{cart.Size}</p>
