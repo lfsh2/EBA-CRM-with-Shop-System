@@ -1039,14 +1039,25 @@ app.put("/addnewadmin/:id", upload.single('admin'), (req, res) => {
 			bcrypt.hash(Password.toString(), salt, (err, hash) => {
 				if (err) return res.json("Error");
 		
-				db.query("UPDATE admin_account SET Image = ?, Username = ?, Role = ?, Email_Address = ?, Password = ? WHERE ID = ?", [image, Username, Role, Email, hash, id], (err, result) => {
-					if (err) {
-						console.error("Error inserting data:", err);
-						return res.status(500).json({ Message: "Error inserting data" });
-					}
-		
-					return res.json({ Status: "Success" });
-				});
+				if (image) {
+					db.query("UPDATE admin_account SET Image = ?, Username = ?, Role = ?, Email_Address = ?, Password = ? WHERE ID = ?", [image, Username, Role, Email, hash, id], (err, result) => {
+						if (err) {
+							console.error("Error inserting data:", err);
+							return res.status(500).json({ Message: "Error inserting data" });
+						}
+			
+						return res.json({ Status: "Success" });
+					});
+				} else {
+					db.query("UPDATE admin_account SET Username = ?, Role = ?, Email_Address = ?, Password = ? WHERE ID = ?", [Username, Role, Email, hash, id], (err, result) => {
+						if (err) {
+							console.error("Error inserting data:", err);
+							return res.status(500).json({ Message: "Error inserting data" });
+						}
+			
+						return res.json({ Status: "Success" });
+					});
+				}
 			})
 		}
 	})
@@ -1062,6 +1073,49 @@ app.delete("/addnewadmin/:id", (req, res) => {
 });
 
 // MANAGE PAGES
+app.post("/addexclusive", itemupload.single('store'), (req, res) => {
+	const image = req.file.filename;
+	const { ItemName } = req.body;
+	const insertQuery = "INSERT INTO exclusive (Image, Item_Name) VALUES ( ?, ?)";
+
+	db.query(insertQuery, [image, ItemName], (err, result) => {
+		if (err) {
+			console.error("Error inserting data:", err);
+			return res.status(500).json({ Message: "Error inserting data" });
+		}
+
+		return res.json({ Status: "Success" });
+	});
+});
+app.post("/addcategories", itemupload.single('store'), (req, res) => {
+	const image = req.file.filename;
+	const { ItemName } = req.body;
+	const insertQuery = "INSERT INTO categories (Image, Item_Name) VALUES ( ?, ?)";
+	
+	db.query(insertQuery, [image, ItemName], (err, result) => {
+		if (err) {
+			console.error("Error inserting data:", err);
+			return res.status(500).json({ Message: "Error inserting data" });
+		}
+		
+		return res.json({ Status: "Success" });
+	});
+});
+app.post("/addstore", itemupload.single('store'), (req, res) => {
+	const image = req.file.filename;
+	const { ItemName, Price } = req.body;
+	const insertQuery = "INSERT INTO store (Image, Item_Name, Price) VALUES ( ?, ?, ?)";
+
+	db.query(insertQuery, [image, ItemName, Price], (err, result) => {
+		if (err) {
+			console.error("Error inserting data:", err);
+			return res.status(500).json({ Message: "Error inserting data" });
+		}
+
+		return res.json({ Status: "Success" });
+	});
+});
+// EDIT ITEM
 app.put("/exclusive/:id", itemupload.single('store'), (req, res) => {
 	const { id } = req.params;
 
@@ -1136,4 +1190,29 @@ app.put("/store/:id", itemupload.single('store'), (req, res) => {
 			}
 		);
 	}
+});
+// DELETE ITEM
+app.delete("/exclusive/:id", (req, res) => {
+	const { id } = req.params;
+	
+	db.query("DELETE FROM exclusive WHERE ID = ?", [id], (err, result) => {
+		if (err) return res.status(500).send(err);
+		res.json({ message: 'Item deleted successfully.' });
+	});
+});
+app.delete("/categories/:id", (req, res) => {
+	const { id } = req.params;
+	
+	db.query("DELETE FROM categories WHERE ID = ?", [id], (err, result) => {
+		if (err) return res.status(500).send(err);
+		res.json({ message: 'Item deleted successfully.' });
+	});
+});
+app.delete("/store/:id", (req, res) => {
+	const { id } = req.params;
+	
+	db.query("DELETE FROM store WHERE ID = ?", [id], (err, result) => {
+		if (err) return res.status(500).send(err);
+		res.json({ message: 'Item deleted successfully.' });
+	});
 });

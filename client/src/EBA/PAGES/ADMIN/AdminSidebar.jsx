@@ -67,12 +67,6 @@ const Sidebar = ({ onMenuClick, isOpen, handleLogout }) => {
 								>
 									<img src='/admin/addnewadmin.png' /> Add New Admin
 								</button>
-								{/* <button
-									onClick={() => handleButtonClick('AddDesign')}
-									className={activeButton === 'AddDesign' ? 'active' : ''}
-								>
-									<img src='/admin/adddesign.png' /> Add Design
-								</button> */}
 								<button
 									onClick={() => handleButtonClick('Pages')}
 									className={activeButton === 'Pages' ? 'active' : ''}
@@ -143,12 +137,7 @@ const Sidebar = ({ onMenuClick, isOpen, handleLogout }) => {
 									>
 										<img src='/admin/addnewadmin.png' /> Add New Admin
 									</button>
-									<button
-										onClick={() => handleButtonClick('AddDesign')}
-										className={activeButton === 'AddDesign' ? 'active' : ''}
-									>
-										<img src='/admin/adddesign.png' /> Add Design
-									</button>
+									
 									<button
 										onClick={() => handleButtonClick('Pages')}
 										className={activeButton === 'Pages' ? 'active' : ''}

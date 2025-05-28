@@ -520,6 +520,10 @@
         grid-template-columns: repeat(3, 1fr);
         flex-wrap: wrap;
         gap: 20px;
+
+        .icon {
+            font-size: 2rem ;
+        }
     
         .card {
             height: 350px;
@@ -555,6 +559,11 @@
             color: white;
             cursor: pointer;
             transition: all 300ms;
+        }
+
+        .btn {
+            display: flex;
+            gap: 10px;
         }
     }
 }
@@ -616,19 +625,31 @@
             }
         }
     }
+
+    .pages {
+        .fourth-section {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
 }
 
-@media screen and (max-width: 450px) {
-.dashboard {
-    .top {
-        .card {
-            max-width: 100%;
+@media screen and (max-width: 460px) {
+    .dashboard {
+        .top {
+            .card {
+                max-width: 100%;
+            }
+        }
+        .graph {
+            .orders {
+                width: 100%;
+            }
         }
     }
-    .graph {
-        .orders {
-            width: 100%;
+
+    .pages {
+        .fourth-section {
+            grid-template-columns: repeat(1, 1fr);
         }
     }
-}
 }

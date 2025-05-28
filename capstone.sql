@@ -117,7 +117,7 @@ VALUES
 INSERT INTO admin_account (Image, Username, Role, Email_Address, Password) 
 VALUES 
 	('logo.png', 'admin', 'Admin', 'admin@cvsu.edu.ph', '$2b$10$UgMbjFKc9X3Pm5SZhcHLyOON2qlw5PSp96WEh86BOdWilVHwo1OP.'),
-	('paulo.png', 'John Paulo Ramos', 'EBA', 'johnpaulo.ramos@cvsu.edu.ph', '$2b$10$2ga4BJrCwugur6B8Yz/GPu1NuN3WfQ5A9M5eO1oHwPTM1n6zSNI/m')
+	('logo.png', 'CvSU - Tanza EBA', 'EBA', 'cvsuebatanza@gmail.com', '$2b$10$dMrS6RqgS6VlFkTKNHywo.ViRZ2RLPlWiRBUNEhOPIVjQyqlOz3za')
 ;
 
 -- EBA STORE
@@ -178,8 +178,9 @@ VALUES
 	('Student_Uniform-Female.png', 'Student Uniform', 'Student Uniform', 'Female', 'Medium', 15, 300),
 	('Student_Uniform-Female.png', 'Student Uniform', 'Student Uniform', 'Female', 'Large', 10, 300),
 	('Student_Uniform-Female.png', 'Student Uniform', 'Student Uniform', 'Female', 'Xtra Large', 3, 300),
-	('DIT.png', 'Department Shirt', 'Department of Technology', 'Original', 'Small', 15, 300),
-	('DIT.png', 'Department Shirt', 'Department of Technology', 'Original', 'Medium', 5, 300),
+	('DIT.png', 'Department Shirt', 'Central Student Government - Tanza Campus', 'White', 'Small', 15, 300),
+	('DIT.png', 'Department Shirt', 'Department of Information Technology', 'Original', 'Small', 15, 300),
+	('DIT.png', 'Department Shirt', 'Department of Information Technology', 'Original', 'Medium', 5, 300),
 	('BSBA-MM.png', 'Department Shirt', 'Department of Management', 'Original', 'Medium', 4, 300),
 	('BSBA-MM.png', 'Department Shirt', 'Department of Management', 'Original', 'Large', 6, 300),
 	('Anglicist_Guild-White.png', 'Organizational Shirt', 'Anglicist Guild', 'White', 'Small', 6, 300),

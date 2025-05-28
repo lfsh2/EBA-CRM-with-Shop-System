@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 const Pages = () => {
 	const [exclusive, setExclusive] = useState([])
@@ -20,6 +20,7 @@ const Pages = () => {
 	});
 	const [message, setMessage] = useState('')
 	const [formMessage, setFormMessage] = useState('')
+	const [openAddItem, setOpenAddItem] = useState(false)
 
 	useEffect(() => {
 		fetchData();	
@@ -82,19 +83,13 @@ const Pages = () => {
     
         try {
             const response = await axios.put(api, formdata);
-    
-            if (response.data.Status === "Success") {
-				fetchData();
-            } else {
-                setEditItem(null);
-                
-                setMessage("Item edited successfully");
-                setTimeout(() => {
-                    setMessage('');
-                }, 2000);
-
-                fetchData();
-            }
+			setEditItem(null);
+			
+			setMessage("Item edited successfully");
+			setTimeout(() => {
+				setMessage('');
+			}, 2000);
+			fetchData();
         } catch (err) {
             setFormMessage('Please fill all field')
             
@@ -102,6 +97,70 @@ const Pages = () => {
                 setFormMessage('');
             }, 2000);
         }
+    };
+
+	const handleAddItem = (e) => {
+		e.preventDefault()
+		
+        const formData = new FormData();
+		
+		formData.append('store', image);
+        formData.append('ItemName', itemName);
+        formData.append('Price', price);
+
+		let api = ''
+
+		if (activeSection === 'Exclusive') {
+			api = `http://localhost:3000/addexclusive`
+		} else if (activeSection === 'Categories') {
+			api = `http://localhost:3000/addcategories`
+		} else if (activeSection === 'Store Items') {
+			api = `http://localhost:3000/addstore`
+		}
+
+        axios.post(api, formData)
+        .then(res => {
+			setOpenAddItem(false)
+			setMessage("Item added successfully");
+			setTimeout(() => {
+				setMessage('');
+			}, 2000);
+
+			fetchData();
+			
+			setItemName('');
+			setPrice('');
+        })
+        .catch(err => {
+            setFormMessage('Please fill all field')
+            
+            setTimeout(() => {
+                setFormMessage('');
+            }, 2000);
+        });
+	}
+	
+    const handleRemove = async (id) => {
+		let api = ''
+
+		if (activeSection === 'Exclusive') {
+			api = `http://localhost:3000/exclusive/${id}`	
+		} else if (activeSection === 'Categories') {
+			api = `http://localhost:3000/categories/${id}`
+		} else if (activeSection === 'Store Items') {
+			api = `http://localhost:3000/store/${id}`
+		}
+        await axios.delete(api);
+        setExclusive(exclusive.filter(exclusive => exclusive.id !== id));
+        setCategories(categories.filter(categories => categories.id !== id));
+        setStore(store.filter(store => store!== id));
+    
+        setMessage("Item deleted successfully");
+        setTimeout(() => {
+            setMessage('');
+        }, 2000);
+        
+        fetchData();
     };
 
 	return (
@@ -121,6 +180,10 @@ const Pages = () => {
 							<h2>Exclusive Section</h2>
 
 							<div className="fourth-section">
+								<div className="card" onClick={() => setOpenAddItem(prev => !prev)}>
+									<FontAwesomeIcon icon={faPlus} className='icon' />
+								</div>
+
 								{exclusive.map((exclusive, index) => (
 									<div className="card" key={index}>
 										<img src={`http://localhost:3000/ITEMS/${exclusive.Image}`} alt="" />
@@ -129,7 +192,10 @@ const Pages = () => {
 											<h3>{exclusive.Item_Name}</h3>
 										</div>
 
-										<button onClick={() => handleEdit(exclusive)}>Edit Item</button>
+										<div className="btn">
+											<button onClick={() => handleEdit(exclusive)}>Edit Item</button>
+											<button onClick={() => handleRemove(exclusive.ID)}>Remove</button>
+										</div>
 									</div>
 								))}
 							</div>
@@ -140,6 +206,10 @@ const Pages = () => {
 							<h2>Categories Section</h2>
 							
 							<div className="fourth-section">
+								<div className="card" onClick={() => setOpenAddItem(prev => !prev)}>
+									<FontAwesomeIcon icon={faPlus} className='icon' />
+								</div>
+
 								{categories.map((categories, index) => (
 									<div className="card" key={index}>
 										<img src={`http://localhost:3000/ITEMS/${categories.Image}`} alt="" />
@@ -147,8 +217,11 @@ const Pages = () => {
 										<div className="name">
 											<h3>{categories.Item_Name}</h3>
 										</div>
-
-										<button onClick={() => handleEdit(categories)}>Edit Item</button>
+										
+										<div className="btn">
+											<button onClick={() => handleEdit(categories)}>Edit Item</button>
+											<button onClick={() => handleRemove(categories.ID)}>Remove</button>
+										</div>
 									</div>
 								))}
 							</div>
@@ -159,6 +232,10 @@ const Pages = () => {
 							<h2>Store Items Section</h2>
 
 							<div className="fourth-section">
+								<div className="card" onClick={() => setOpenAddItem(prev => !prev)}>
+									<FontAwesomeIcon icon={faPlus} className='icon' />
+								</div>
+
 								{store.map((store, index) => (
 									<div className="card" key={index}>
 										<img src={`http://localhost:3000/ITEMS/${store.Image}`} alt="" />
@@ -168,7 +245,10 @@ const Pages = () => {
 											<p>Price: {store.Price}</p>
 										</div>
 
-										<button onClick={() => handleEdit(store)}>Edit Item</button>
+										<div className="btn">
+											<button onClick={() => handleEdit(store)}>Edit Item</button>
+											<button onClick={() => handleRemove(store.ID)}>Remove</button>
+										</div>
 									</div>
 								))}
 							</div>
@@ -177,11 +257,59 @@ const Pages = () => {
 
 					{message && <div className='messages'>{message}</div>}
 
+					{openAddItem && (
+						<div className="modal-container">
+							<div className="modal">
+								<div className="title">
+									<FontAwesomeIcon icon={faChevronLeft} className='icon' onClick={() => setOpenAddItem(null)}/>
+									<h3>Add Item</h3>
+								</div>
+
+								<form onSubmit={handleAddItem}>
+									<div className="input-block">
+										<label>Image:</label>
+										<input 
+											type="file" 
+											onChange={handleFile}
+										/>
+									</div>
+									<div className="input-block">
+										<label>Item Name:</label>
+										<input
+											type="text" 
+											value={itemName}
+                                        	onChange={(e) => setItemName(e.target.value)}
+											placeholder='Enter Item Name'
+											required
+											/>
+									</div>
+
+									{activeSection === 'Store Items' && (
+										<div className="input-block">
+											<label>Price:</label>
+											<input
+												type="number" 
+												value={price}
+												placeholder='Enter Price'
+												onChange={(e) => setPrice(e.target.value)}
+												required
+											/>
+										</div>
+									)} 
+
+                                	{formMessage && <div className='form-message'>{formMessage}</div>}
+
+                                	<button type="submit">Add Item</button>
+								</form>
+							</div>
+						</div>
+					)}
+
 					{editItem && (
 						<div className="modal-container">
 							<div className="modal">
 								<div className="title">
-									<FontAwesomeIcon icon={faChevronLeft} className='icon' onClick={() => setEditItem	(null)}/>
+									<FontAwesomeIcon icon={faChevronLeft} className='icon' onClick={() => setEditItem(null)}/>
 									<h3>Edit Item</h3>
 								</div>
 
