@@ -81,6 +81,37 @@ app.post('/userlogin', (req, res) => {
 		})
 	})
 })
+app.post('/usersignup', (req, res) => {
+	const { email, password } = req.body;
+
+	const checkQuery = "SELECT * FROM user_account WHERE Email_Address = ?";
+	
+	db.query(checkQuery, [email], (err, result) => {
+		if (err) {
+			console.error("Error checking existing users:", err);
+			res.status(500).send("Server error");
+			return;
+		}
+
+		if (result.length > 0) {
+			return res.json({ Status: "Email address already exists" });
+		}
+
+		const insertQuery = "INSERT INTO user_account (Email_Address, Password) VALUES (?, ?)";
+		bcrypt.hash(password.toString(), salt, (err, hash) => {
+			if (err) return res.json("Error");
+
+			db.query(insertQuery, [email, hash], (err, result) => {
+				if (err) {
+					console.error("Error inserting data:", err);
+					return res.status(500).json({ Message: "Error inserting data" });
+				}
+	
+				return res.json({ Status: "Success" });
+			});
+		})
+	});
+})
 app.get("/exclusive", (req, res) => {
 	db.query("SELECT * FROM exclusive", (err, results) => {
 		if (err) return res.status(500).send(err);

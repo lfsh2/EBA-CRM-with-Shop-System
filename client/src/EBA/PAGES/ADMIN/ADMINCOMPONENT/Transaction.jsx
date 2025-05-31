@@ -55,7 +55,6 @@ const Transaction = () => {
             amount: transaction.Amount,
             customerName: transaction.Customer_Name,
             emailAddress: transaction.Email_Address,
-            phoneNumber: transaction.Phone_Number,
             date: transaction.Date,
             status: transaction.Status
         });
@@ -158,7 +157,6 @@ const Transaction = () => {
                                     <>
                                         <th>Customer Name</th>
                                         <th>Email Address</th>
-                                        <th>Phone Number</th>
                                         <th>Date</th>
                                         <th>Status</th>
                                     </>
@@ -188,7 +186,6 @@ const Transaction = () => {
                                             <>
                                                 <td>{transaction.Customer_Name}</td>
                                                 <td>{transaction.Email_Address}</td>
-                                                <td>{transaction.Phone_Number}</td>
                                                 <td>{formatDate(transaction.Date)}</td>
                                                 <td>{transaction.Status}</td>
                                             </>
@@ -220,7 +217,6 @@ const Transaction = () => {
                                 <div className="detail-block"><label>Amount:</label><p>₱{formData.amount}</p></div>
                                 <div className="detail-block"><label>Customer Name:</label><p>{formData.customerName}</p></div>
                                 <div className="detail-block"><label>Email Address:</label><p>{formData.emailAddress}</p></div>
-                                <div className="detail-block"><label>Phone Number:</label><p>{formData.phoneNumber}</p></div>
                                 <div className="detail-block"><label>Date:</label><p>{formatDate(formData.date)}</p></div>
                                 <div className="detail-block"><label>Status:</label><p>{formData.status}</p></div>
 

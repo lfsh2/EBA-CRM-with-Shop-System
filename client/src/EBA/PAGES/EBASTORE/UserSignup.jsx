@@ -9,7 +9,7 @@ import './CSS/LandingStore.css';
 import './CSS/Preloader.css';
 import InputForm from '../../InputForm';
 
-const UserLogin = () => {
+const UserSignin = () => {
 	const navigateTo = useNavigate();
 	const [message, setMessage] = useState('');
 	const [loading, setLoading] = useState(false);
@@ -42,33 +42,46 @@ const UserLogin = () => {
 	const onChange = (e) => {
 		setValues({...values, [e.target.name]: e.target.value})
 	}
-
 	
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setLoading(true);
+        
         if (!values.email.endsWith('@cvsu.edu.ph')) {
             setMessage('Use CvSU account');
             setTimeout(() => setMessage(''), 3000);
             return;
         }
-	
-		try {
-			const response = await axios.post('http://localhost:3000/userlogin', values);
-			const { token } = response.data;
+        
+		axios.post('http://localhost:3000/usersignup', values)
+		.then(res => {
+            if (res.data.Status === "Success") {
+                const { token } = response.data;
+                localStorage.setItem('token', token);
 
-			localStorage.setItem('token', token);
+                navigateTo('/userlogin');
 
-			setTimeout(() => {
-				navigateTo('/ebastore');
-			}, 3000);
-		} catch (err) {
+                setTimeout(() => {
+                    setLoading(false);
+                }, 3000);
+			} 
+			if (res.data.Status === "Email address already exists") {
+				setMessage(res.data.Status);
+
+				setTimeout(() => {
+					setMessage('');
+				}, 2000);
+			}
+			else {
+				console.log("Failed");
+			}
+		})
+		.catch(err => {
 			setLoading(false);
 			setMessage('Invalid credentials');
 			setTimeout(() => {
 				setMessage('')
 			}, 3000);
-		}
+		});
 	};
 
 	if (loading) {
@@ -83,7 +96,7 @@ const UserLogin = () => {
 						<div className="cube"></div>
 						<div className="cube"></div>
 					</div>
-					<div className="preloader-text">Logging in...</div>
+					<div className="preloader-text">Signing Up...</div>
 				</div>
 			</div>
 		);
@@ -95,7 +108,7 @@ const UserLogin = () => {
 				<form onSubmit={handleSubmit}>
 					<div className='title'>
 						<a href='/' className='login-button'><FontAwesomeIcon icon={faArrowLeft} /></a>
-						<h2>LOGIN</h2>
+						<h2>Sign Up</h2>
 					</div>
 
 					{inputs.map((input) => (
@@ -107,15 +120,15 @@ const UserLogin = () => {
 						/>
 					))}
 
-					<p>Don't have account? <a href="/usersignup">create account here.</a></p>
+					<p>Already have account? <a href="/userlogin">log in here.</a></p>
 
 					{message && <div className='messages'>{message}</div>}
 
-					<button type='submit'>Login</button>
+					<button type='submit'>Sign Up</button>
 				</form>
 			</div>
 		</div>
 	)
 }
 
-export default UserLogin
+export default UserSignin

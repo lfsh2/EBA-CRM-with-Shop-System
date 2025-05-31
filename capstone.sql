@@ -13,7 +13,7 @@ CREATE TABLE admin_account (
 );
 CREATE TABLE user_account (
 	ID INT AUTO_INCREMENT PRIMARY KEY,
-	Full_Name VARCHAR(255) NOT NULL,
+	Username VARCHAR(255) NOT NULL,
 	Email_Address VARCHAR(255) NOT NULL,
 	Password VARCHAR(255) NOT NULL
 );
@@ -109,10 +109,10 @@ VALUES
 ;
 
 -- USER AND ADMIN ACCOUNTS
-INSERT INTO user_account (Full_Name, Email_Address, Password) 
+INSERT INTO user_account (Email_Address, Password) 
 VALUES 
-	('user', 'user@cvsu.edu.ph', '$2b$10$oD3/4NfcwFtUwipIy3nN1OtZmHCWZG0sBEzw2OiGPdVXhO7KM81Zq'),
-	('admin', 'marcandrei.nisperos@cvsu.edu.ph', '$2b$10$UgMbjFKc9X3Pm5SZhcHLyOON2qlw5PSp96WEh86BOdWilVHwo1OP.')
+	('user@cvsu.edu.ph', '$2b$10$oD3/4NfcwFtUwipIy3nN1OtZmHCWZG0sBEzw2OiGPdVXhO7KM81Zq'),
+	('marcandrei.nisperos@cvsu.edu.ph', '$2b$10$UgMbjFKc9X3Pm5SZhcHLyOON2qlw5PSp96WEh86BOdWilVHwo1OP.')
 ;
 INSERT INTO admin_account (Image, Username, Role, Email_Address, Password) 
 VALUES 

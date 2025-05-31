@@ -41,7 +41,6 @@ const Store = () => {
 	const [quantity, setQuantity] = useState('');
 	const [fullName, setFullName] = useState('');
 	const [emailAddress, setEmailAddress] = useState('');
-	const [phone, setPhone] = useState('');
 	const [amount, setAmount] = useState('');
 
 	const filteredItems = selectedCategory
@@ -189,7 +188,7 @@ const Store = () => {
 	}
 
 	function uniformFormValidation() {
-		if (!itemName || !variantName || !size || !quantity || !fullName || !emailAddress || !phone) {
+		if (!itemName || !variantName || !size || !quantity || !fullName || !emailAddress) {
 			setFormMessage('Please fill in all required fields.');
 			setTimeout(() => {
 				setFormMessage('');
@@ -211,7 +210,6 @@ const Store = () => {
 		formData.append('Quantity', quantity);
 		formData.append('CustomerName', fullName);
 		formData.append('EmailAddress', emailAddress);
-		formData.append('PhoneNumber', phone);
 		formData.append('Amount', amount);
 		
 		try {
@@ -235,7 +233,6 @@ const Store = () => {
 				setVariantName('');
 				setSize('');
 				setQuantity('');
-				setPhone('');
 			} else {
 				console.log('failed submit')
 			}
@@ -245,7 +242,7 @@ const Store = () => {
 	};
 
 	function itemFormValidation() {
-		if (!itemName || !quantity || !fullName || !emailAddress || !phone) {
+		if (!itemName || !quantity || !fullName || !emailAddress) {
 			setFormMessage('Please fill in all required fields.');
 			setTimeout(() => {
 				setFormMessage('');
@@ -265,7 +262,6 @@ const Store = () => {
 		formData.append('Quantity', quantity);
 		formData.append('CustomerName', fullName);
 		formData.append('EmailAddress', emailAddress);
-		formData.append('PhoneNumber', phone);
 		formData.append('Amount', amount);
 		
 		try {
@@ -287,7 +283,6 @@ const Store = () => {
 
 				setItemName('');
 				setQuantity('');
-				setPhone('');
 			} else {
 				console.log('failed submit')
 			}
@@ -339,13 +334,19 @@ const Store = () => {
 
 										<div className="input-block">
 											<label>Item Size: </label>
-											<input
-												type="text"
+											<select 
+												name="" 
+												id=""
 												value={size}
 												onChange={(e) => setSize(e.target.value)}
-												placeholder='Enter size in centimeters'
 												required
-											/>
+											>
+												<option value="" selected disabled>Select size</option>
+												<option value="Small">Small</option>
+												<option value="Medium">Medium</option>
+												<option value="Large">Large</option>
+												<option value="Xtra Large">Xtra Large</option>
+											</select>
 										</div>
 								
 									</>
@@ -384,17 +385,6 @@ const Store = () => {
 										onChange={(e) => setEmailAddress(e.target.value)}
 										placeholder='Enter your address'
 										readOnly
-									/>
-								</div>
-						
-								<div className="input-block">
-									<label>Phone Number: </label>
-									<input
-										type="number"
-										value={phone}
-										onChange={(e) => setPhone(e.target.value)}
-										placeholder='Enter your phone number'
-										required
 									/>
 								</div>
 						

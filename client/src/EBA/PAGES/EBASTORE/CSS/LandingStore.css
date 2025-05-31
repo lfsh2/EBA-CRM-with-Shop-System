@@ -85,10 +85,9 @@
 
 	.form {
 		width: 450px;
-		height: 500px;
 		background: white;
 		border-radius: 20px;
-
+		
 		form {
 			width: 90%;
 			height: 100%;
@@ -98,8 +97,7 @@
 			justify-content: center;
 			align-items: center;
 			flex-direction: column;
-			gap: 50px;
-
+			gap: 30px;
 		}
 		
 		.title {

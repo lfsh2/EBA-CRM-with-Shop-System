@@ -29,7 +29,7 @@ const Bulletin = () => {
 
 			<h1>ANNOUNCEMENT</h1>
 
-			<div className="card-block">
+			<div className="card-block announcement">
 				{bulletins.map((bulletin, index) => (
 					<div className="card" key={index}>
 						<h3>{bulletin.Title}</h3>
@@ -38,6 +38,16 @@ const Bulletin = () => {
 					</div> 
 				))}
 			</div>
+
+			{/* <div className="card-block shop-announcement">
+				{bulletins.map((bulletin, index) => (
+					<div className="card" key={index}>
+						<h3>{bulletin.Title}</h3>
+						<p className="writer">Written by: <span>{bulletin.Faculty} {bulletin.Faculty_Staff}</span></p>
+						<p>{bulletin.Details}</p>
+					</div> 
+				))}
+			</div> */}
 		</div>
 	)
 }

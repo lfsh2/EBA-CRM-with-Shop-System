@@ -9,6 +9,7 @@ import AboutDeveloper from './EBA/PAGES/AboutUs';
 
 import EBALandingStore from './EBA/PAGES/EBASTORE/LandingStore';
 import EBAUserLogin from './EBA/PAGES/EBASTORE/UserLogin';
+import EBAUserSignup from './EBA/PAGES/EBASTORE/UserSignup';
 import EBAStore from './EBA/PAGES/EBASTORE/Store';
 import EBACart from './EBA/PAGES/EBASTORE/Cart';
 
@@ -32,6 +33,7 @@ function App() {
 
 				{/* EBA STORE PAGE */}
 				<Route path='/userlogin' element={<EBAUserLogin />}></Route>
+				<Route path='/usersignup' element={<EBAUserSignup />}></Route>
 				<Route path='/ebalandingstore' element={<EBALandingStore />}></Route>
 				<Route path='/ebastore' element={<EBAStore />}></Route>
 				<Route path='/ebacart' element={<EBACart />}></Route>
