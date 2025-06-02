@@ -54,7 +54,7 @@ const Store = () => {
 		}
 	
 		const decodedToken = JSON.parse(atob(token.split('.')[1]));
-		setFullName(decodedToken.fullname);
+		setFullName(decodedToken.username);
 		setEmailAddress(decodedToken.email);
 		setUserId(decodedToken.id);
 
@@ -154,7 +154,7 @@ const Store = () => {
 	const handleVariant = (variant) => {
 		setSelectedItemId(variant.ID)
 
-		if (selectedCategory === 'Capstone Manual' || selectedCategory === 'Module' || variant.Category === 'Capstone Manual' || variant.Category === 'Module') {
+		if (variant.Category === 'Capstone Manual' || variant.Category === 'Module') {
 			setOpenModal(true);
 			setFormHide(false);
 			setCategory(variant.Category)

@@ -76,7 +76,7 @@ app.post('/userlogin', (req, res) => {
 			if (err) throw err;
 			if (!isMatch) return res.status(400).json({ message: 'Incorrect password' });
 	  
-			const token = jwt.sign({ id: user.ID, fullname: user.Full_Name, email: user.Email_Address }, 'secret_key', { expiresIn: '1h' });
+			const token = jwt.sign({ id: user.ID, username: user.Username, email: user.Email_Address }, 'secret_key', { expiresIn: '1h' });
 			res.json({ token });
 		})
 	})
@@ -492,6 +492,18 @@ app.post('/adminchangepass', async (req, res) => {
 		console.error(err);
 		res.status(500).json({ message: 'Server error' });
 	}
+});
+
+// NOTIFICATION
+app.get('/new-orders', async (req, res) => {
+	const [rows] = await db.query("SELECT * FROM transaction WHERE Status = 'Pending'");
+	res.json(rows);
+});
+
+// Get low stock items (e.g., threshold = 5)
+app.get('/low-stock', async (req, res) => {
+	const [rows] = await db.query("SELECT * FROM inventory WHERE quantity <= 5");
+	res.json(rows);
 });
 
 

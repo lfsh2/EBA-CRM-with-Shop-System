@@ -101,6 +101,14 @@ CREATE TABLE inventory (
 	Price INT NOT NULL
 );	
 
+-- TABLE FOR ADMINPANEL NOTIFICATION
+CREATE TABLE notification (
+	ID INT AUTO_INCREMENT PRIMARY KEY,
+	Message VARCHAR(255) NOT NULL,
+	Created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);	
+
+
 
 -- BULLETIN PAGE
 INSERT INTO bulletin (Title, Details, Faculty, Faculty_Staff)
@@ -109,10 +117,10 @@ VALUES
 ;
 
 -- USER AND ADMIN ACCOUNTS
-INSERT INTO user_account (Email_Address, Password) 
+INSERT INTO user_account (Username, Email_Address, Password) 
 VALUES 
-	('user@cvsu.edu.ph', '$2b$10$oD3/4NfcwFtUwipIy3nN1OtZmHCWZG0sBEzw2OiGPdVXhO7KM81Zq'),
-	('marcandrei.nisperos@cvsu.edu.ph', '$2b$10$UgMbjFKc9X3Pm5SZhcHLyOON2qlw5PSp96WEh86BOdWilVHwo1OP.')
+	('User', 'user@cvsu.edu.ph', '$2b$10$oD3/4NfcwFtUwipIy3nN1OtZmHCWZG0sBEzw2OiGPdVXhO7KM81Zq'),
+	('Marc Andrei Nisperos', 'marcandrei.nisperos@cvsu.edu.ph', '$2b$10$UgMbjFKc9X3Pm5SZhcHLyOON2qlw5PSp96WEh86BOdWilVHwo1OP.')
 ;
 INSERT INTO admin_account (Image, Username, Role, Email_Address, Password) 
 VALUES 
@@ -198,4 +206,11 @@ VALUES
 INSERT INTO transaction (Image, Item_Name, Variant, Size, Quantity, Amount, Customer_Name, Email_Address, Phone_Number, Date, Status, created_At)
 VALUES 
 	('Student_Uniform-Male.png', 'Student Uniform', 'Male', 'Medium', 20, 300, 'Paulo', 'paulo@paulo.com', 1, NOW(), 'Pending', NOW())
+;
+
+-- ADMINPANEL NOTIFICATION
+INSERT INTO notification (Message, Created_At)
+VALUES 
+	('New Order', NOW()),
+	('Low Stock Item', NOW())
 ;

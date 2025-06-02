@@ -12,7 +12,7 @@ import AddDesign from './ADMINCOMPONENT/AddDesign';
 import Pages from './ADMINCOMPONENT/Pages';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faEnvelope, faBell, faSun, faMoon, faX, faChevronDown, } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faEnvelope, faBell, faSun, faMoon, faX } from '@fortawesome/free-solid-svg-icons';
 
 import './CSS/Admin.css';
 import './CSS/Component.css';
