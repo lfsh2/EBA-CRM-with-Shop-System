@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 import Sidebar from './AdminSidebar';
 import Dashboard from './ADMINCOMPONENT/Dashboard';
@@ -11,6 +12,7 @@ import AddNewAdmin from './ADMINCOMPONENT/AddNewAdmin';
 import AddDesign from './ADMINCOMPONENT/AddDesign';
 import Pages from './ADMINCOMPONENT/Pages';
 
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faEnvelope, faBell, faSun, faMoon, faX } from '@fortawesome/free-solid-svg-icons';
 
@@ -18,6 +20,9 @@ import './CSS/Admin.css';
 import './CSS/Component.css';
 
 const AdminPanel = () => {
+    const [notifications, setNotifications] = useState([]);
+	const [notifDropdown, setNotifDropdown] = useState(false);
+
 	const [isDarkMode, setIsDarkMode] = useState(false);
 	const [activeAdmin, setActiveComponent] = useState('Dashboard');
 	const [isOpen, setIsOpen] = useState(false);
@@ -40,6 +45,8 @@ const AdminPanel = () => {
 
 		setImage(decodedToken.image);
 		setUsername(decodedToken.username);
+
+		fetchNotifications();
 	}, [token])
 
 	const handleMenuClick = (componentName) => {
@@ -51,6 +58,15 @@ const AdminPanel = () => {
 		
 		navigateTo('/adminlogin');
 	};	
+
+    const fetchNotifications = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/notifications');
+            setNotifications(response.data);
+            } catch (err) {
+            console.error('Error fetching notifications:', err);
+        }
+    };
 
 	return (
 		<div className={isDarkMode ? 'adminpanel dark-mode' : 'adminpanel light-mode'}>
@@ -66,15 +82,45 @@ const AdminPanel = () => {
 					</div>
 
 					<div className="buttons">
-						<button>
+						<button className='mail-btn'>
 							<FontAwesomeIcon icon={faEnvelope} className='icon' />
 						</button>
 
-						<button>
+						<button onClick={() => setNotifDropdown(prev => !prev)} className='notif-btn'>
 							<FontAwesomeIcon icon={faBell} className='icon'/>
+							<span>{notifications.length}</span>
 						</button>
 
-						<button onClick={() => setIsDarkMode(!isDarkMode)} className='toggle-theme'>
+						{notifDropdown && (
+							<div className="notification-container">
+								{notifications.length === 0 ? (
+									<p>No new notifications.</p>
+								) : (
+									<ul className="notification">
+										{notifications.map((notif, index) => (
+											<li key={index}>
+												{notif.type === 'transaction' ? (
+													<div className='notif'>
+														<p>🛒 New Order</p>
+														<p><span>{notif.Item_Name}</span> ({notif.Variant}, {notif.Size})</p>
+														<p>Quantity: {notif.Quantity}</p>
+														<p>Order Time: {new Date(notif.time).toLocaleString()}</p>
+													</div>
+												) : (
+													<div className='notif'>
+														<p>⚠️ Low Stock</p>
+														<p><span>{notif.Item_Name}</span> ({notif.Variant}, {notif.Size})</p>
+														<p>Remaining: {notif.Quantity}</p>
+													</div>
+												)}
+											</li>
+										))}
+									</ul>
+								)}
+							</div>
+						)}
+
+						<button onClick={() => setIsDarkMode(!isDarkMode)} className='theme-btn'>
 							<FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} className='icon' />
 						</button>
 

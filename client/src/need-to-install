@@ -10,4 +10,4 @@ npm i --save @fortawesome/react-fontawesome@latest
 
 
 server folder
-npm i mysql2 express cors body-parser nodemon multer path
+npm i mysql2 express cors body-parser nodemon multer path 

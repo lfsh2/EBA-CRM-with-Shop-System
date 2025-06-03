@@ -19,7 +19,7 @@ const CalendarComponent = () => {
 		<div className="admin-content">
 			<h1>Calendar</h1>
 			
-			<div className="calendar-container">
+			<div className="calendar main-content">
 				<Calendar 
 					onChange={onChange}
 					value={value}

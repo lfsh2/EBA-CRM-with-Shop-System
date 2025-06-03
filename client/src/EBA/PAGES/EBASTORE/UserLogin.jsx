@@ -47,11 +47,6 @@ const UserLogin = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setLoading(true);
-        if (!values.email.endsWith('@cvsu.edu.ph')) {
-            setMessage('Use CvSU account');
-            setTimeout(() => setMessage(''), 3000);
-            return;
-        }
 	
 		try {
 			const response = await axios.post('http://localhost:3000/userlogin', values);

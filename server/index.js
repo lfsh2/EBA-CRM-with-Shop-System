@@ -495,15 +495,43 @@ app.post('/adminchangepass', async (req, res) => {
 });
 
 // NOTIFICATION
-app.get('/new-orders', async (req, res) => {
-	const [rows] = await db.query("SELECT * FROM transaction WHERE Status = 'Pending'");
-	res.json(rows);
-});
+app.get('/notifications', (req, res) => {
+	const query = `
+		SELECT 
+		'transaction' AS type, 
+		ID, 
+		Item_Name, 
+		Variant, 
+		Size, 
+		Quantity, 
+		created_At AS time, 
+		Status 
+		FROM transaction 
+		WHERE Status = 'Pending'
+		
+		UNION ALL
+		
+		SELECT 
+		'low_stock' AS type, 
+		ID, 
+		Item_Name, 
+		Variant, 
+		Size, 
+		Quantity, 
+		NULL AS time, 
+		NULL AS Status 
+		FROM inventory 
+		WHERE Quantity <= 5
+		ORDER BY time DESC;
+	`;
 
-// Get low stock items (e.g., threshold = 5)
-app.get('/low-stock', async (req, res) => {
-	const [rows] = await db.query("SELECT * FROM inventory WHERE quantity <= 5");
-	res.json(rows);
+	db.query(query, (err, results) => {
+		if (err) {
+			console.error('Error fetching notifications:', err);
+			return res.status(500).json({ error: 'Database query error' });
+		}
+		res.json(results);
+	});
 });
 
 
