@@ -147,6 +147,7 @@ const Transaction = () => {
                                 {table ? (
                                     <>
                                         <th>Image</th>
+                                        <th>Order ID</th>
                                         <th>Item Name</th>
                                         <th>Variant</th>
                                         <th>Size</th>
@@ -176,6 +177,7 @@ const Transaction = () => {
                                         {table ? (
                                             <>
                                                 <td><img src={`http://localhost:3000/ITEMS/${transaction.Image}`} alt="" /></td>
+                                                <td>#{transaction.Order_ID}</td>
                                                 <td>{transaction.Item_Name}</td>
                                                 <td>{transaction.Variant || '-'}</td>
                                                 <td>{transaction.Size || '-'}</td>

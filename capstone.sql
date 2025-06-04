@@ -76,6 +76,7 @@ CREATE TABLE item_cart (
 -- TABLE FOR EBA STORE
 CREATE TABLE transaction (
 	ID INT AUTO_INCREMENT PRIMARY KEY,
+	Order_ID INT NOT NULL,
 	Image VARCHAR(255) NOT NULL,
 	Item_Name VARCHAR(255) NOT NULL,
 	Variant VARCHAR(255) NOT NULL,
@@ -120,12 +121,12 @@ VALUES
 INSERT INTO user_account (Username, Email_Address, Password) 
 VALUES 
 	('User', 'user@cvsu.edu.ph', '$2b$10$oD3/4NfcwFtUwipIy3nN1OtZmHCWZG0sBEzw2OiGPdVXhO7KM81Zq'),
-	('Marc Andrei Nisperos', 'marcandrei.nisperos@cvsu.edu.ph', '$2b$10$UgMbjFKc9X3Pm5SZhcHLyOON2qlw5PSp96WEh86BOdWilVHwo1OP.')
+	('Marc Andrei Nisperos', 'marcandrei.nisperos@cvsu.edu.ph', '$2b$10$48ugdvROggruUMM7bM4k9uoBnr.NpWukcf7e.GhHXPuJ7UQWaROry')
 ;
 INSERT INTO admin_account (Image, Username, Role, Email_Address, Password) 
 VALUES 
 	('logo.png', 'admin', 'Admin', 'admin@cvsu.edu.ph', '$2b$10$UgMbjFKc9X3Pm5SZhcHLyOON2qlw5PSp96WEh86BOdWilVHwo1OP.'),
-	('logo.png', 'CvSU - Tanza EBA', 'EBA', 'cvsuebatanza@gmail.com', '$2b$10$dMrS6RqgS6VlFkTKNHywo.ViRZ2RLPlWiRBUNEhOPIVjQyqlOz3za')
+	('logo.png', 'CvSU - Tanza EBA', 'EBA', 'cvsutanzaeba@gmail.com', '$2b$10$InnCInuCdCQv4AxHyWwWpej0AW2Blug6daIUbIoOtLNteB8Dg0fNy')
 ;
 
 -- EBA STORE
@@ -203,9 +204,9 @@ VALUES
 	('Module.png', 'Module', 'English', '', '', 10, 300),
 	('Capstone_Manual.png', 'Capstone Manual', 'Capstone Manual', '', '', 10, 300)
 ;
-INSERT INTO transaction (Image, Item_Name, Variant, Size, Quantity, Amount, Customer_Name, Email_Address, Phone_Number, Date, Status, created_At)
+INSERT INTO transaction (Image, Order_ID, Item_Name, Variant, Size, Quantity, Amount, Customer_Name, Email_Address, Phone_Number, Date, Status, created_At)
 VALUES 
-	('Student_Uniform-Male.png', 'Student Uniform', 'Male', 'Medium', 20, 300, 'Paulo', 'paulo@paulo.com', 1, NOW(), 'Pending', NOW())
+	('Student_Uniform-Male.png', 202501, 'Student Uniform', 'Male', 'Medium', 20, 300, 'Paulo', 'paulo@paulo.com', 1, NOW(), 'Pending', NOW())
 ;
 
 -- ADMINPANEL NOTIFICATION

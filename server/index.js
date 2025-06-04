@@ -191,8 +191,7 @@ app.post("/addOrderUniform", upload.single('transaction'), (req, res) => {
 		Variant = '',
 		Size = '',
 		Quantity,
-		Amount,
-		PhoneNumber
+		Amount
 	} = req.body;
 
 	try {
@@ -232,8 +231,8 @@ app.post("/addOrderUniform", upload.single('transaction'), (req, res) => {
 			} else {
 				let insertQuery = `
 					INSERT INTO item_cart 
-					(User_ID, Category, Image, Item_Name, Variant, Size, Quantity, Amount, Phone_Number) 
-					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+					(User_ID, Category, Image, Item_Name, Variant, Size, Quantity, Amount) 
+					VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 				`;
 
 				let values = [
@@ -244,8 +243,7 @@ app.post("/addOrderUniform", upload.single('transaction'), (req, res) => {
 					Variant || '',
 					Size || '',
 					Quantity,
-					Amount,
-					PhoneNumber
+					Amount
 				];
 
 				db.query(insertQuery, values, (err, result) => {
@@ -299,7 +297,7 @@ app.post('/checkout', (req, res) => {
                 ic.Amount,
                 ic.Phone_Number,
                 ic.Date,
-                ua.Full_Name,
+                ua.Username,
                 ua.Email_Address
             FROM 
                 user_account ua
@@ -319,24 +317,23 @@ app.post('/checkout', (req, res) => {
 
             const cartItems = results.filter(row => row.Item_Name !== null);
 
-			if (cartItems.length === 0) {
-				console.log("Your cart is empty");
-				return db.rollback(() => res.status(400).json({ error: "Your cart is empty" }));
-			}
+            if (cartItems.length === 0) {
+                console.log("Your cart is empty");
+                return db.rollback(() => res.status(400).json({ error: "Your cart is empty" }));
+            }
 
-            const Pending = 'Pending';
-
+            const Pending = 'Pending';					
             const insertQuery = `
                 INSERT INTO transaction 
-                (Image, Item_Name, Variant, Size, Quantity, Amount, Customer_Name, Email_Address, Phone_Number, Date, Status) 
+                (Image, Item_Name, Variant, Size, Quantity, Amount, Customer_Name, Email_Address, Date, Status) 
                 VALUES ?
             `;
 
             const values = cartItems.map(row => [
-				row.Image, row.Item_Name, row.Variant, row.Size, row.Quantity,
-				row.Amount * row.Quantity, row.Full_Name, row.Email_Address, row.Phone_Number,
-				row.Date, Pending
-			]);
+                row.Image, row.Item_Name, row.Variant, row.Size, row.Quantity,
+                row.Amount * row.Quantity, row.Username, row.Email_Address,
+                row.Date, Pending
+            ]);
 
             db.query(insertQuery, [values], async (err, insertResult) => {
                 if (err) {
@@ -344,108 +341,127 @@ app.post('/checkout', (req, res) => {
                     return db.rollback(() => res.status(500).json({ error: "Insert failed" }));
                 }
 
-                const orderID = insertResult.insertId;
-                const currentDate = new Date();
-                const year = currentDate.getFullYear().toString().slice(-2);
-                const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-                const day = currentDate.getDate().toString().padStart(2, '0');
-                const formattedDate = `${month}-${day}-${year}`;
+                // Generate order ID
+                const orderID = `${new Date().getFullYear()}0${insertResult.insertId}`;
+                const firstInsertId = insertResult.insertId;
+                const rowCount = insertResult.affectedRows;
 
-                try {
-					const itemRowsHTML = cartItems.map(row => {
-						const variantDisplay = row.Variant?.trim() ? row.Variant : '';
-						const sizeDisplay = row.Size?.trim() ? row.Size : '';
-						const productDisplay = [row.Item_Name, variantDisplay, sizeDisplay]
-							.filter(part => part) 
-							.join(' - ');
-					
-						return `
-							<tr>
-								<td style="border: 1px solid gray; padding: 8px; text-align: center;">${productDisplay}</td>
-								<td style="border: 1px solid gray; padding: 8px; text-align: center;">₱${row.Amount} x ${row.Quantity} = ₱${row.Amount * row.Quantity}</td>
-							</tr>
-						`;
-					}).join('');
-					
+                // Update order ID for all inserted rows
+                const updateOrderIdQuery = `
+                    UPDATE transaction
+                    SET Order_ID = ?
+                    WHERE ID >= ? AND ID < ?
+                `;
 
-					const totalAmount = cartItems.reduce((sum, row) => sum + (row.Amount * row.Quantity), 0);
-					const user = cartItems[0];
+                const updateParams = [orderID, firstInsertId, firstInsertId + rowCount];
 
-					const orderID = `${new Date().getFullYear()}0${insertResult.insertId}`;
+                db.query(updateOrderIdQuery, updateParams, async (err) => {
+                    if (err) {
+                        console.error("Order ID Update Error:", err);
+                        return db.rollback(() => res.status(500).json({ error: "Failed to update order ID" }));
+                    }
 
-					const mailOptions = {
-						from: 'cvsutanzaeba@gmail.com',
-						to: user.Email_Address,
-						subject: 'Order Details',
-						html: `
-							<header style='height: 150px; background: #c1ff72; display: flex; flex-direction: column; gap: 10px;'>
-								<img src="https://res.cloudinary.com/dfmnlcvbe/image/upload/v1744102780/logo_qy0g8a.png" style='width: 80px; height: 80px;'/>
-								<h2>External Business and<br>Affairs</h2>
-							</header>
+                    // Continue with email sending
+                    const currentDate = new Date();
+                    const year = currentDate.getFullYear().toString().slice(-2);
+                    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+                    const day = currentDate.getDate().toString().padStart(2, '0');
+                    const formattedDate = `${month}-${day}-${year}`;
 
-							<br>
+                    try {
+                        const itemRowsHTML = cartItems.map(row => {
+                            const variantDisplay = row.Variant?.trim() ? row.Variant : '';
+                            const sizeDisplay = row.Size?.trim() ? row.Size : '';
+                            const productDisplay = [row.Item_Name, variantDisplay, sizeDisplay]
+                                .filter(part => part)
+                                .join(' - ');
 
-							<h3>Thank you for your order!</h3>
-							<p>${user.Full_Name}</p>
-							<p>Your order was received! We're working to get it processed and ready to claim.</p>
+                            return `
+                                <tr>
+                                    <td style="border: 1px solid gray; padding: 8px; text-align: center;">${productDisplay}</td>
+                                    <td style="border: 1px solid gray; padding: 8px; text-align: center;">₱${row.Amount} x ${row.Quantity} = ₱${row.Amount * row.Quantity}</td>
+                                </tr>
+                            `;
+                        }).join('');
 
-							<br>
+                        const totalAmount = cartItems.reduce((sum, row) => sum + (row.Amount * row.Quantity), 0);
+                        const user = cartItems[0];
 
-							<div style='display: flex; align-items: center;'>
-								<div style="margin-right: 30px;">
-									<p>Order Number:</p>
-									<span>#${orderID}</span>
-								</div>
-								<div>
-									<p>Order Date:</p>
-									<span>${formattedDate}</span>
-								</div>
-							</div>
+                        const mailOptions = {
+                            from: 'cvsutanzaeba@gmail.com',
+                            to: user.Email_Address,
+                            subject: 'Order Details',
+                            html: `
+                                <header style='height: 150px; background: #c1ff72; display: flex; flex-direction: column; gap: 10px;'>
+                                    <img src="https://res.cloudinary.com/dfmnlcvbe/image/upload/v1744102780/logo_qy0g8a.png" style='width: 80px; height: 80px;'/>
+                                    <h2>External Business and<br>Affairs</h2>
+                                </header>
 
-							<br>
+                                <br>
 
-							<table style="border: 1px solid gray; border-collapse: collapse; width: 100%; text-align: left;">
-								<tr>
-									<th style="border: 1px solid gray; padding: 8px; text-align: center;">PRODUCT</th>
-									<th style="border: 1px solid gray; padding: 8px; text-align: center;">PRICE</th>
-								</tr>
-								${itemRowsHTML}
-								<tr>
-									<td style="border: 1px solid gray; padding: 8px; text-align: center;"></td>
-									<td style="border: 1px solid gray; padding: 8px; text-align: center;"><strong>Total: P${totalAmount}</strong></td>
-								</tr>
-							</table>
+                                <h3>Thank you for your order!</h3>
+                                <p>${user.Username}</p>
+                                <p>Your order was received! We're working to get it processed and ready to claim.</p>
 
-							<p>Thank you for your purchase!</p>
-							<p>Cavite State University - Tanza Campus</p>
-						`
-					};
+                                <br>
 
-					await transporter.sendMail(mailOptions);
+                                <div style='display: flex; align-items: center;'>
+                                    <div style="margin-right: 30px;">
+                                        <p>Order Number:</p>
+                                        <span>#${orderID}</span>
+                                    </div>
+                                    <div>
+                                        <p>Order Date:</p>
+                                        <span>${formattedDate}</span>
+                                    </div>
+                                </div>
 
-                    db.query("DELETE FROM item_cart WHERE User_ID = ?", [userId], (err) => {
-                        if (err) {
-                            console.error("Cart Clear Error:", err);
-                            return db.rollback(() => res.status(500).json({ error: "Failed to clear cart" }));
-                        }
+                                <br>
 
-                        db.commit((err) => {
+                                <table style="border: 1px solid gray; border-collapse: collapse; width: 100%; text-align: left;">
+                                    <tr>
+                                        <th style="border: 1px solid gray; padding: 8px; text-align: center;">PRODUCT</th>
+                                        <th style="border: 1px solid gray; padding: 8px; text-align: center;">PRICE</th>
+                                    </tr>
+                                    ${itemRowsHTML}
+                                    <tr>
+                                        <td style="border: 1px solid gray; padding: 8px; text-align: center;"></td>
+                                        <td style="border: 1px solid gray; padding: 8px; text-align: center;"><strong>Total: ₱${totalAmount}</strong></td>
+                                    </tr>
+                                </table>
+
+                                <p>Thank you for your purchase!</p>
+                                <p>Cavite State University - Tanza Campus</p>
+                            `
+                        };
+
+                        await transporter.sendMail(mailOptions);
+
+                        db.query("DELETE FROM item_cart WHERE User_ID = ?", [userId], (err) => {
                             if (err) {
-                                console.error("Commit Error:", err);
-                                return db.rollback(() => res.status(500).json({ error: "Transaction commit failed" }));
+                                console.error("Cart Clear Error:", err);
+                                return db.rollback(() => res.status(500).json({ error: "Failed to clear cart" }));
                             }
 
-                            res.json({ Status: "Success" });
+                            db.commit((err) => {
+                                if (err) {
+                                    console.error("Commit Error:", err);
+                                    return db.rollback(() => res.status(500).json({ error: "Transaction commit failed" }));
+                                }
+
+                                res.json({ Status: "Success", OrderID: orderID });
+                            });
                         });
-                    });
-                } catch (emailError) {
-                    console.error("Email Error:", emailError);
-                    return db.rollback(() => res.status(500).json({ error: "Email sending failed" }));
-                }
+                    } catch (emailError) {
+                        console.error("Email Error:", emailError);
+                        return db.rollback(() => res.status(500).json({ error: "Email sending failed" }));
+                    }
+                });
             });
         });
     });
 });
+
 
 
 
