@@ -45,8 +45,6 @@ const AdminPanel = () => {
 
 		setImage(decodedToken.image);
 		setUsername(decodedToken.username);
-
-		fetchNotifications();
 	}, [token])
 
 	const handleMenuClick = (componentName) => {
@@ -58,6 +56,12 @@ const AdminPanel = () => {
 		
 		navigateTo('/adminlogin');
 	};	
+
+	useEffect(() => {
+		fetchNotifications(); // initial load
+		const interval = setInterval(fetchNotifications, 5000); // every 5 seconds
+		return () => clearInterval(interval); // cleanup
+	}, []);
 
     const fetchNotifications = async () => {
         try {

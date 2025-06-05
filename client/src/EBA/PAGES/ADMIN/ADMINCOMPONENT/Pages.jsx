@@ -6,21 +6,28 @@ import { faChevronLeft, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 const Pages = () => {
 	const [exclusive, setExclusive] = useState([])
-	const [categories, setCategories] = useState([])
+	const [storeCategories, setStoreCategories] = useState([])
 	const [store, setStore] = useState([])
 	const [activeSection, setActiveSection] = useState('Exclusive');
 	const [editItem, setEditItem] = useState(null);
+	const [showEditForm, setShowEditForm] = useState(false);
 	
 	const [image, setImage] = useState('')
+	const [category, setCategory] = useState('')
 	const [itemName, setItemName] = useState('')
 	const [price, setPrice] = useState('')
 	const [formData, setFormData] = useState({
+		Category: '',
 		Item_Name: '',
 		Price: ''
 	});
+
 	const [message, setMessage] = useState('')
 	const [formMessage, setFormMessage] = useState('')
 	const [openAddItem, setOpenAddItem] = useState(false)
+	const [confirmation, setConfirmation] = useState(false);
+	const [msg, setMsg] = useState('');
+	const [IDRemove, setIDRemove] = useState('');
 
 	useEffect(() => {
 		fetchData();	
@@ -30,8 +37,8 @@ const Pages = () => {
         const exclusiveData = await axios.get('http://localhost:3000/exclusive');
         setExclusive(exclusiveData.data);
 		
-        const categoriesData = await axios.get('http://localhost:3000/categories');
-        setCategories(categoriesData.data);
+        const storeCategoriesData = await axios.get('http://localhost:3000/storecategories');
+        setStoreCategories(storeCategoriesData.data);
 
 		const storeData = await axios.get('http://localhost:3000/store');
 		setStore(storeData.data);
@@ -40,6 +47,40 @@ const Pages = () => {
 	const handleSectionClick = (section) => {
 		setActiveSection(section);
 	}
+
+	const handleAddClick = (e) => {
+		e.preventDefault();
+
+		setMsg('add')
+		setConfirmation(prev => !prev)
+		setOpenAddItem(false);
+	}
+	const handleEditClick = () => {
+		setMsg('edit')
+		setConfirmation(prev => !prev)
+		setShowEditForm(false);
+	}
+	const handleRemoveClick = (id) => {
+		setMsg('remove')
+		setConfirmation(prev => !prev)
+		setIDRemove(id)
+	}
+	
+	const handleConfirm = () => {
+		setConfirmation(prev => !prev)
+		
+		if (msg === 'add') {
+			handleAddItem()
+		} else if (msg === 'edit') {
+			handleUpdate();
+		} else if (msg === 'remove') {
+			handleRemove(IDRemove)
+		}
+	}
+	const handleCancel = () => {
+		setMsg('')
+		setConfirmation(prev => !prev)
+	}
 	
     const handleFile = (e) => {
         setImage(e.target.files[0])
@@ -47,8 +88,10 @@ const Pages = () => {
 
 	const handleEdit = (store) => {
 		setEditItem(store)
+		setShowEditForm(prev => !prev)
 		
         setFormData({ 
+            category: store.Category,
             itemName: store.Item_Name,
             price: store.Price
         });
@@ -58,53 +101,12 @@ const Pages = () => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
-	
-    const handleUpdate = async (e) => {
-		e.preventDefault();
-		
-        const formdata = new FormData();
-    
-        if (image) {
-            formdata.append('store', image);
-        }
-    
-        formdata.append('itemName', formData.itemName);
-        formdata.append('price', formData.price);
 
-		let api = ''
-
-		if (activeSection === 'Exclusive') {
-			api = `http://localhost:3000/exclusive/${editItem.ID}`
-		} else if (activeSection === 'Categories') {
-			api = `http://localhost:3000/categories/${editItem.ID}`
-		} else if (activeSection === 'Store Items') {
-			api = `http://localhost:3000/store/${editItem.ID}`
-		}
-    
-        try {
-            const response = await axios.put(api, formdata);
-			setEditItem(null);
-			
-			setMessage("Item edited successfully");
-			setTimeout(() => {
-				setMessage('');
-			}, 2000);
-			fetchData();
-        } catch (err) {
-            setFormMessage('Please fill all field')
-            
-            setTimeout(() => {
-                setFormMessage('');
-            }, 2000);
-        }
-    };
-
-	const handleAddItem = (e) => {
-		e.preventDefault()
-		
+	const handleAddItem = () => {
         const formData = new FormData();
 		
 		formData.append('store', image);
+        formData.append('Category', category);
         formData.append('ItemName', itemName);
         formData.append('Price', price);
 
@@ -140,13 +142,52 @@ const Pages = () => {
         });
 	}
 	
+    const handleUpdate = async () => {	
+        const formdata = new FormData();
+    
+        if (image) {
+            formdata.append('store', image);
+        }
+    
+        formdata.append('category', formdata.category);
+        formdata.append('itemName', formData.itemName);
+        formdata.append('price', formData.price);
+
+		let api = ''
+
+		if (activeSection === 'Exclusive') {
+			api = `http://localhost:3000/exclusive/${editItem.ID}`
+		} else if (activeSection === 'Categories') {
+			api = `http://localhost:3000/storecategories/${editItem.ID}`
+		} else if (activeSection === 'Store Items') {
+			api = `http://localhost:3000/store/${editItem.ID}`
+		}
+    
+        try {
+            const response = await axios.put(api, formdata);
+			setEditItem(null);
+			
+			setMessage("Item edited successfully");
+			setTimeout(() => {
+				setMessage('');
+			}, 2000);
+			fetchData();
+        } catch (err) {
+            setFormMessage('Please fill all field')
+            
+            setTimeout(() => {
+                setFormMessage('');
+            }, 2000);
+        }
+    };
+	
     const handleRemove = async (id) => {
 		let api = ''
 
 		if (activeSection === 'Exclusive') {
 			api = `http://localhost:3000/exclusive/${id}`	
 		} else if (activeSection === 'Categories') {
-			api = `http://localhost:3000/categories/${id}`
+			api = `http://localhost:3000/storecategories/${id}`
 		} else if (activeSection === 'Store Items') {
 			api = `http://localhost:3000/store/${id}`
 		}
@@ -174,6 +215,18 @@ const Pages = () => {
 					<button onClick={() => handleSectionClick('Store Items')}>Store Items Section</button>
 				</div>
 
+				{confirmation && (
+					<div className="modal-container">
+						<div className="confirmation">
+							<p>Are you sure you want to {msg} item?</p>
+							<div className="btn">
+								<button onClick={handleConfirm}>Yes</button>
+								<button onClick={handleCancel}>No</button>
+							</div>
+						</div>
+					</div>
+				)}
+
 				<div className="section-container">
 					{activeSection === 'Exclusive' && (
 						<div className="exclusive-section">
@@ -194,7 +247,7 @@ const Pages = () => {
 
 										<div className="btn">
 											<button onClick={() => handleEdit(exclusive)}>Edit Item</button>
-											<button onClick={() => handleRemove(exclusive.ID)}>Remove</button>
+											<button onClick={() => handleRemoveClick(exclusive.ID)}>Remove</button>
 										</div>
 									</div>
 								))}
@@ -210,7 +263,7 @@ const Pages = () => {
 									<FontAwesomeIcon icon={faPlus} className='icon' />
 								</div>
 
-								{categories.map((categories, index) => (
+								{storeCategories.map((categories, index) => (
 									<div className="card" key={index}>
 										<img src={`http://localhost:3000/ITEMS/${categories.Image}`} alt="" />
 
@@ -265,13 +318,26 @@ const Pages = () => {
 									<h3>Add Item</h3>
 								</div>
 
-								<form onSubmit={handleAddItem}>
+								<form onSubmit={handleAddClick}>
 									<div className="input-block">
 										<label>Image:</label>
 										<input 
 											type="file" 
 											onChange={handleFile}
 										/>
+									</div>
+									<div className="input-block">
+										<label>Category:</label>
+										<select
+											value={category} 
+											onChange={(e) => setCategory(e.target.value)}
+											required 
+										>
+											<option value="" disabled>Select Category</option>
+											{storeCategories.map((category, index) => (
+												<option key={index} value={category.Category}>{category.Category}</option>
+											))}
+										</select>
 									</div>
 									<div className="input-block">
 										<label>Item Name:</label>
@@ -305,7 +371,7 @@ const Pages = () => {
 						</div>
 					)}
 
-					{editItem && (
+					{showEditForm && editItem && (
 						<div className="modal-container">
 							<div className="modal">
 								<div className="title">
@@ -313,13 +379,27 @@ const Pages = () => {
 									<h3>Edit Item</h3>
 								</div>
 
-								<form onSubmit={handleUpdate}>
+								<form>
 									<div className="input-block">
 										<label>Image:</label>
 										<input 
 											type="file" 
 											onChange={handleFile}
 										/>
+									</div>
+									<div className="input-block">
+										<label>Category:</label>
+										<select
+											value={formData.category}  
+                                        	name='category'
+											onChange={handleChange}
+											required 
+										>
+											<option value="" disabled>Select Category</option>
+											{storeCategories.map((category, index) => (
+												<option key={index} value={category.Category}>{category.Category}</option>
+											))}
+										</select>
 									</div>
 									<div className="input-block">
 										<label>Item Name:</label>
@@ -347,7 +427,7 @@ const Pages = () => {
 
                                 	{formMessage && <div className='form-message'>{formMessage}</div>}
 
-                                	<button type="submit">Edit Item</button>
+                                	<button type="button" onClick={handleEditClick}>Edit Item</button>
 								</form>
 							</div>
 						</div>

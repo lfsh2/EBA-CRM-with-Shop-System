@@ -91,7 +91,7 @@ const Store = () => {
 		const response1 = await axios.get('http://localhost:3000/exclusive');
 		setExclusive(response1.data);
 
-		const response2 = await axios.get('http://localhost:3000/categories');
+		const response2 = await axios.get('http://localhost:3000/storecategories');
 		setCategories(response2.data);
 
 		const response3 = await axios.get('http://localhost:3000/store');

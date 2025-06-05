@@ -35,7 +35,7 @@ CREATE TABLE exclusive (
 	Image VARCHAR(255) NOT NULL,
 	Item_Name VARCHAR(255) NOT NULL
 );
-CREATE TABLE categories (
+CREATE TABLE store_categories (
 	ID INT AUTO_INCREMENT PRIMARY KEY,
 	Category VARCHAR(255) NOT NULL,
 	Image VARCHAR(255) NOT NULL,
@@ -138,7 +138,7 @@ VALUES
   ('Capstone Manual', 'Capstone_Manual.png', 'Capstone Manual'),
   ('Module', 'Module.png', 'Mathematics Module')
 ;
-INSERT INTO categories (Category, Image, Item_Name)
+INSERT INTO store_categories (Category, Image, Item_Name)
 VALUES
   ('Student Uniform', 'Student_Uniform-Male.png', 'Student Uniform'),
   ('Department Shirt', 'DIT.png', 'Department of Information Technology'),

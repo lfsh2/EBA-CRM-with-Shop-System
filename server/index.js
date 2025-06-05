@@ -21,6 +21,9 @@ const db = mysql.createConnection({
 	user: "root",
 	password: "",
 	database: "capstone",
+	waitForConnections: true,
+	connectionLimit: 10,
+	queueLimit: 0
 });
 
 app.listen(port, () => {
@@ -118,8 +121,8 @@ app.get("/exclusive", (req, res) => {
 		res.json(results);
 	});
 });
-app.get("/categories", (req, res) => {
-	db.query("SELECT * FROM categories", (err, results) => {
+app.get("/storecategories", (req, res) => {
+	db.query("SELECT * FROM store_categories", (err, results) => {
 		if (err) return res.status(500).send(err);
 		res.json(results);
 	});
@@ -1162,10 +1165,10 @@ app.delete("/addnewadmin/:id", (req, res) => {
 // MANAGE PAGES
 app.post("/addexclusive", itemupload.single('store'), (req, res) => {
 	const image = req.file.filename;
-	const { ItemName } = req.body;
-	const insertQuery = "INSERT INTO exclusive (Image, Item_Name) VALUES ( ?, ?)";
+	const { Category, ItemName } = req.body;
+	const insertQuery = "INSERT INTO exclusive (Category, Image, Item_Name) VALUES (?, ?, ?)";
 
-	db.query(insertQuery, [image, ItemName], (err, result) => {
+	db.query(insertQuery, [Category, image, ItemName], (err, result) => {
 		if (err) {
 			console.error("Error inserting data:", err);
 			return res.status(500).json({ Message: "Error inserting data" });
@@ -1176,10 +1179,10 @@ app.post("/addexclusive", itemupload.single('store'), (req, res) => {
 });
 app.post("/addcategories", itemupload.single('store'), (req, res) => {
 	const image = req.file.filename;
-	const { ItemName } = req.body;
-	const insertQuery = "INSERT INTO categories (Image, Item_Name) VALUES ( ?, ?)";
+	const { Category, ItemName } = req.body;
+	const insertQuery = "INSERT INTO store_categories (Category, Image, Item_Name) VALUES (?, ?, ?)";
 	
-	db.query(insertQuery, [image, ItemName], (err, result) => {
+	db.query(insertQuery, [Category, image, ItemName], (err, result) => {
 		if (err) {
 			console.error("Error inserting data:", err);
 			return res.status(500).json({ Message: "Error inserting data" });
@@ -1190,10 +1193,10 @@ app.post("/addcategories", itemupload.single('store'), (req, res) => {
 });
 app.post("/addstore", itemupload.single('store'), (req, res) => {
 	const image = req.file.filename;
-	const { ItemName, Price } = req.body;
-	const insertQuery = "INSERT INTO store (Image, Item_Name, Price) VALUES ( ?, ?, ?)";
+	const { Category, ItemName, Price } = req.body;
+	const insertQuery = "INSERT INTO store (Category, Image, Item_Name, Price) VALUES (?, ?, ?, ?)";
 
-	db.query(insertQuery, [image, ItemName, Price], (err, result) => {
+	db.query(insertQuery, [Category, image, ItemName, Price], (err, result) => {
 		if (err) {
 			console.error("Error inserting data:", err);
 			return res.status(500).json({ Message: "Error inserting data" });
@@ -1210,17 +1213,17 @@ app.put("/exclusive/:id", itemupload.single('store'), (req, res) => {
 	if (req.file) {
 		image = req.file.filename;
 	}	
-	const { itemName } = req.body;
+	const { category, itemName } = req.body;
 
 	if (image) {
-		db.query("UPDATE exclusive SET Image = ?, Item_Name = ? WHERE ID = ?",
-			[image, itemName, id], (err, results) => {
+		db.query("UPDATE exclusive SET Category = ?, Image = ?, Item_Name = ? WHERE ID = ?",
+			[category, image, itemName, id], (err, results) => {
 				if (err) return res.status(500).send(err);
 				res.json({ message: 'Item updated successfully.' });
 			}
 		);
 	} else {
-		db.query("UPDATE exclusive SET Item_Name = ? WHERE ID = ?",
+		db.query("UPDATE exclusive SET Category = ?, Item_Name = ? WHERE ID = ?",
 			[itemName, id], (err, results) => {
 				if (err) return res.status(500).send(err);
 				res.json({ message: 'Item updated successfully.' });
@@ -1228,25 +1231,25 @@ app.put("/exclusive/:id", itemupload.single('store'), (req, res) => {
 		);
 	}
 });
-app.put("/categories/:id", itemupload.single('store'), (req, res) => {
+app.put("/storecategories/:id", itemupload.single('store'), (req, res) => {
 	const { id } = req.params;
 
 	let image = null;
 	if (req.file) {
 		image = req.file.filename;
 	}	
-	const { itemName } = req.body;
+	const { category, itemName } = req.body;
 
 	if (image) {
-		db.query("UPDATE categories SET Image = ?, Item_Name = ? WHERE ID = ?",
-			[image, itemName, id], (err, results) => {
+		db.query("UPDATE store_categories SET Category = ?, Image = ?, Item_Name = ? WHERE ID = ?",
+			[category, image, itemName, id], (err, results) => {
 				if (err) return res.status(500).send(err);
 				res.json({ message: 'Item updated successfully.' });
 			}
 		);
 	} else {
-		db.query("UPDATE categories SET Item_Name = ? WHERE ID = ?",
-			[itemName, id], (err, results) => {
+		db.query("UPDATE store_categories SET Category = ?, Item_Name = ? WHERE ID = ?",
+			[category, itemName, id], (err, results) => {
 				if (err) return res.status(500).send(err);
 				res.json({ message: 'Item updated successfully.' });
 			}
@@ -1260,18 +1263,18 @@ app.put("/store/:id", itemupload.single('store'), (req, res) => {
 	if (req.file) {
 		image = req.file.filename;
 	}	
-	const { itemName, price } = req.body;
+	const { category, itemName, price } = req.body;
 
 	if (image) {
-		db.query("UPDATE store SET Image = ?, Item_Name = ?, Price = ? WHERE ID = ?",
-			[image, itemName, price, id], (err, results) => {
+		db.query("UPDATE store SET Category = ?, Image = ?, Item_Name = ?, Price = ? WHERE ID = ?",
+			[category, image, itemName, price, id], (err, results) => {
 				if (err) return res.status(500).send(err);
 				res.json({ message: 'Item updated successfully.' });
 			}
 		);
 	} else {
-		db.query("UPDATE store SET Item_Name = ?, Price = ? WHERE ID = ?",
-			[itemName, price, id], (err, results) => {
+		db.query("UPDATE store SET Category = ?, Item_Name = ?, Price = ? WHERE ID = ?",
+			[category, itemName, price, id], (err, results) => {
 				if (err) return res.status(500).send(err);
 				res.json({ message: 'Item updated successfully.' });
 			}
@@ -1287,10 +1290,10 @@ app.delete("/exclusive/:id", (req, res) => {
 		res.json({ message: 'Item deleted successfully.' });
 	});
 });
-app.delete("/categories/:id", (req, res) => {
+app.delete("/storecategories/:id", (req, res) => {
 	const { id } = req.params;
 	
-	db.query("DELETE FROM categories WHERE ID = ?", [id], (err, result) => {
+	db.query("DELETE FROM store_categories WHERE ID = ?", [id], (err, result) => {
 		if (err) return res.status(500).send(err);
 		res.json({ message: 'Item deleted successfully.' });
 	});
