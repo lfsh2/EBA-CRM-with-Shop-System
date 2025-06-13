@@ -1,0 +1,653 @@
+.dashboard.main-content {
+    background: none;
+}
+.dashboard {
+	width: 100%;
+	padding: 5px;
+	
+	.top {
+		display: flex;
+		gap: 20px;
+		flex-wrap: wrap;
+		
+		.card {
+			width: 200px;
+			height: 100px;
+			padding: 10px;
+			background: var(--bg-color);
+			border-radius: 10px;
+			display: flex;
+			justify-content: space-around;
+			flex-direction: column;
+			flex-grow: 1;
+
+			p {
+				font-size: 0.9rem;
+			}
+		}
+	}
+
+	.graph {
+		display: flex;
+		justify-content: space-between;
+		gap: 20px;
+		flex-wrap: wrap;
+		
+		.card {
+			width: 400px;
+			max-height: 400px;
+            min-height: 400px;
+            height: 100%;
+			padding: 10px;
+			background: var(--bg-color);
+			border-radius: 10px;
+			flex-grow: 1;
+			overflow-y: auto;
+
+			h2 {
+				padding-bottom: 5px;
+				border-bottom: 1px solid #acacac;
+			}
+		}
+	}
+
+	.graphs {
+		flex-wrap: nowrap;
+
+        td {
+            height: auto;
+        }
+
+		.cards{
+			padding: 0;
+			background: none;
+			display: flex;
+			gap: 20px;
+		}
+		
+		.orders-card {
+			max-height: 400px;
+            height: 100%;
+			padding: 10px;
+			background: var(--bg-color);
+			border-radius: 10px;
+			flex-grow: 1;
+			overflow-y: auto;
+		}
+	}
+
+	.pending-block {
+		width: 100%;
+		padding: 10px 0;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		overflow: auto;
+
+		.pending {
+			width: 100%;
+			padding: 10px;
+			display: flex;
+			justify-content: start;
+			align-items: center;
+			gap: 10px;
+			border: 1px solid var(--txt-color);
+			text-align: center;
+		}
+	}
+}
+
+.transaction {
+	.top {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 10px;
+
+		.top-block {
+			display: flex;
+            align-items: center;
+			gap: 30px;
+            position: relative;
+
+			.filter {
+				cursor: pointer;
+			}
+
+            .filter-dropdown {
+                width: 200px;
+                background: var(--bg-color);
+                padding: 10px;
+                box-shadow: 0 0 5px #acacac;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                position: absolute;
+                top: 130%;
+                right: 0;
+                z-index: 9;
+
+                button {
+                    width: 100%;
+                    padding: 5px;
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                }
+            }
+		}
+
+		p {
+			width: auto;
+			border-radius: 10px;
+			color: white;
+			border: none;
+			cursor: pointer;
+			padding: 10px;
+			background: #FF9000;
+		}
+	}
+
+	table {
+		button {
+			--btn-bg1: #FF9000;
+			--btn-bg2: #4E91F6;
+			--btn-bg3: red;
+		}
+	}
+
+    .order {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+        gap: 20px;
+        
+        .detail-block {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            img {
+                height: 100px;
+                object-fit: contain;
+                display: flex;
+                justify-content: start;
+            }
+            
+            .img-block{
+                width: 60%;
+                height: 100%;
+            }
+
+            p {
+                width: 60%;
+				padding-left: 5px;
+                text-align: left;
+				border-bottom: 1px solid black;
+            }
+        }
+
+        .detail-btn {
+            height: auto;
+            justify-content: center;
+            gap: 30px;
+
+            button {
+                width: 40%;
+                padding: 10px;
+                background: var(--btn-bg);
+                border-radius: 5px;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+            button:nth-child(1) {
+                --btn-bg: #4E91F6;
+            }
+            button:nth-child(2) {
+                --btn-bg: red;
+            }
+        }
+    }
+}
+
+.announcement {
+	.date {
+		width: 100%;
+		height: 50vh;
+	}
+
+	.top {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		position: relative;
+
+		button {
+			padding: 10px 15px;
+			background: #FF9000;
+			border: none;
+			border-radius: 15px;
+			color: white;
+			font-size: 1rem;
+			position: absolute;
+			top: 50%;
+			right: 0;
+			transform: translateY(-50%);
+			cursor: pointer;
+		}
+	}
+
+	.lists {
+		width: 100%;
+		padding: 20px 0;
+		display: flex;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 20px;
+
+		.card {
+			min-width: 500px;
+			width: 100%;
+			max-width: 49%;
+			height: 200px;
+            border: 1px solid var(--txt-color);
+			padding: 10px;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			position: relative;
+
+			.card-btn {
+				padding: 5px 0;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+
+				.btn-block {
+					display: flex;
+					gap: 10px;
+
+					button {
+						font-size: 1rem;
+						color: var(--txt-color);
+						border: none;
+						background: none;
+						cursor: pointer;
+					}
+				}
+			}
+		}
+	}
+
+    .date-picker {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: var(--bg-color);
+        color: var(--txt-color);
+    }
+
+    .react-datepicker {
+        font-family: inherit;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: var(--bg-color);
+    }
+
+    .react-datepicker__header {
+        background-color: #FF9000;
+        color: white;
+    }
+
+    .react-datepicker__current-month,
+    .react-datepicker__day-name {
+        color: white;
+    }
+
+    .react-datepicker__day--selected {
+        background-color: #FF9000;
+        color: white;
+    }
+
+    .react-datepicker__time-container {
+        border-left: 1px solid #ccc;
+    }
+
+    .react-datepicker__time-box {
+        width: 100px !important;
+    }
+
+    .rbc-calendar {
+        background-color: var(--bg-color);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .rbc-header {
+        padding: 10px;
+        background-color: #FF9000;
+        color: white;
+    }
+
+    .rbc-event {
+        background-color: #FF9000;
+        border: none;
+        padding: 4px;
+    }
+
+    .rbc-today {
+        background-color: rgba(255, 144, 0, 0.1);
+    }
+
+    .rbc-toolbar button {
+        color: var(--txt-color);
+        border: 1px solid #ccc;
+        
+        &:hover {
+            background-color: #FF9000;
+            color: white;
+        }
+        
+        &.rbc-active {
+            background-color: #FF9000;
+            color: white;
+        }
+    }
+
+    .rbc-month-view {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .rbc-off-range-bg {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .input-block {
+        margin-bottom: 15px;
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+    }
+}
+
+.inventory {
+	.top {
+		display: flex;
+		gap: 10px;
+
+		select, button {
+			padding: 10px;
+			border-radius: 10px;
+			cursor: pointer;
+		}
+
+		select, option {
+			max-width: 200px;
+			background: none;
+			border: 1px solid var(--txt-color);
+			color: var(--txt-color);
+			background: var(--bg-color);
+		}
+
+		button {
+			border: none;
+			background: none;
+			font-size: 1rem;
+		}
+
+		.button {
+			background: #FF9000;
+			color: white;
+		}
+	}
+
+	table {
+		button {
+			--btn-bg1: #4E91F6;
+			--btn-bg2: red;
+		}
+	}
+}
+
+.add-new-admin {
+	.top {
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+        align-items: center;
+
+		button {
+			padding: 10px 15px;
+			background: #FF9000;
+			border: none;
+			border-radius: 15px;
+			color: white;
+			font-size: 1rem;
+			cursor: pointer;
+		}
+	}
+
+	table {
+		button {
+			--btn-bg1: #4E91F6;
+			--btn-bg2: red;
+		}
+	}
+}
+
+.design {
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0 !important;
+
+    .sidebar {
+        max-width: 80px;
+        width: 7%;
+        background: var(--bg-color);
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+
+        button {
+            width: 100%;
+            border: none;
+            background: none;
+
+            img {
+                width: 100%;
+                object-fit: contain;
+            }
+        }
+    }
+
+    .technical-sketch {
+        border-right: 1px solid var(--txt-color);
+    }
+
+    .panel {
+        max-width: 47%;
+        width: 100%;
+        padding: 10px;
+        flex-grow: 1;
+
+        .top {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1rem;
+        }
+
+        img {
+            width: 100px;
+        }
+    }
+}
+
+.pages {
+    .section-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+
+        button {
+            padding: 10px;
+            background: #FF9000;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 300ms;
+        }
+    }
+
+	.fourth-section {
+        padding: 20px 0;
+		display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        flex-wrap: wrap;
+        gap: 20px;
+
+        .icon {
+            font-size: 2rem ;
+        }
+    
+        .card {
+            height: 350px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 10px;
+            cursor: pointer;
+            text-decoration: none;
+    
+            img {
+                width: 80%;
+                height: 50%;
+                object-fit: contain;
+            }
+        }
+
+        .name {
+            text-align: center;
+            color: var(--txt-color);
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: #FF9000;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 300ms;
+        }
+
+        .btn {
+            display: flex;
+            gap: 10px;
+        }
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .dashboard {
+        .top {
+			flex-wrap: wrap;
+        }
+        .graphs {
+            flex-wrap: wrap;
+
+            .orders {
+                max-width: 100%;
+            }
+
+            .orders-card {
+                max-width: 50%;
+                width: 100%;
+                flex-grow: 1;
+            }
+        }
+    }
+
+    .transaction {
+        .top {
+            flex-direction: column-reverse;
+            align-items: start;
+            gap: 20px;
+        }
+    }
+
+    .announcement {
+        .top {
+            justify-content: space-between;
+            align-items: center;
+
+            button {
+                position: static;
+                transform: none;
+            }
+        }
+    }
+
+    .inventory {
+        .add-inventory {
+            form {
+                .form {
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+    .add-new-admin {
+        form {
+            .input-block {
+                width: 100%;
+            }
+        }
+    }
+
+    .pages {
+        .fourth-section {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+}
+
+@media screen and (max-width: 460px) {
+    .dashboard {
+        .top {
+            .card {
+                max-width: 100%;
+            }
+        }
+        .graph {
+            .orders {
+                width: 100%;
+            }
+        }
+    }
+
+    .pages {
+        .fourth-section {
+            grid-template-columns: repeat(1, 1fr);
+        }
+    }
+}

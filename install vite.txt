@@ -1,0 +1,23 @@
+npm install --save-dev vite react react-dom
+
+
+for the other packages: 
+npm install @vitejs/plugin-react --save-dev
+
+then make : npm install sa loob ng client folder 
+npm  install ka na din sa loob ng server para sure sa mga packages
+
+
+logn credentials 
+
+ebastore
+email: user@cvsu.edu.ph
+pass: user
+
+adminpanel(EBA STAFF)
+email: cvsuebatanza@gmail.com
+pass: cvsuebatanza123
+
+adminpanel(STAFF)
+email: admin@cvsu.edu.ph
+pass: admin

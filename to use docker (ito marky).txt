@@ -1,0 +1,12 @@
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
+
+
+
+# 2. Build and run the containers
+docker-compose up --build
+
+
+para mapadali na buhay mo hahaha
+
+install ka muna pala ng docker desktop

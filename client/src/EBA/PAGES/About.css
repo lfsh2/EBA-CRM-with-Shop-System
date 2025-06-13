@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+.about {
+	.container {
+		width: 100%;
+		margin-bottom: 50px;
+		display: flex;
+		flex-direction: column;
+		gap: 50px;
+	}
+
+	h1 {
+		color: green;
+		font-family: Bebas Neue;
+		letter-spacing: 3px;
+		border-bottom: 1px solid black;
+	}
+
+	.cvsu {
+		height: 300px;
+		background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('cvsu.jpg');
+		background-position: center;
+		background-size: cover;
+		display: flex;
+		align-items: center;
+		
+		h1 {
+			width: 80%;
+			margin: auto;
+			color: white;
+			font-size: 3rem;
+			letter-spacing: 5px;
+			border: none;
+		}
+	}
+
+	.university {
+		width: 80%;
+		padding: 30px 0;
+		margin: auto;
+		display: flex;
+		flex-direction: column;
+		gap: 30px;
+		
+		h1 {
+			width: 35%;
+			padding: 10px 0;
+			font-size: 2.3rem;
+		}
+
+		p {
+			font-size: 1.2rem;
+			font-weight: 500;
+		}
+	}
+}
+
+.aboutus {
+	.header {
+		padding: 50px;
+		text-align: center;
+
+		h1 {
+			font-size: 3rem;
+			font-family: Bebas Neue;
+			letter-spacing: 3px;
+		}
+	}
+	
+	.members {
+		text-align: center;
+
+		h2 {
+			padding: 20px;
+			font-family: Bebas Neue;
+			letter-spacing: 3px;
+			font-size: 2rem;
+		}
+
+		.team {
+			width: 100%;
+			padding: 30px 0;
+			
+			.card-block {
+				width: 100%;
+				padding: 40px;
+				display: flex;
+				justify-content: center;
+				align-items: start;
+				flex-wrap: wrap;
+				gap: 0 50px;
+				
+				.card {
+					width: 250px;
+					display: flex;
+					align-items: center;
+					flex-direction: column;
+					gap: 20px;
+
+					.img-block {
+						img {
+							width: 100%;
+							height: 100%;
+							aspect-ratio: 1/1;
+							object-fit: cover;
+						}
+					}
+					.text-block {
+						width: 100%;
+						text-align: left;
+						display: flex;
+						flex-direction: column;
+						gap: 20px;
+					}
+				}
+			}
+		}
+	}
+}
+
+@media (max-width: 1080px) {
+	.about {
+		.university {
+			h1 {
+				width: 100%;
+			}
+		}
+	}
+
+    .aboutus {
+        .members {
+            .team {
+                .card-block {
+                    .card {
+                        width: 70%;
+                    }
+                }
+            }
+        }
+    }
+}
+@media (max-width: 600px) {
+    .aboutus {
+        .members {
+            .team {
+                .card-block {
+                    .card {
+                        width: 90%;
+                    }
+                }
+            }
+        }
+    }
+}
