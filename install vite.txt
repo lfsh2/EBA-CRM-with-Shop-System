@@ -15,8 +15,11 @@ email: user@cvsu.edu.ph
 pass: user
 
 adminpanel(EBA STAFF)
-email: cvsuebatanza@gmail.com
-pass: cvsuebatanza123
+email: 
+cvsuebatanza@gmail.com
+
+pass:
+cvsuebatanza123
 
 adminpanel(STAFF)
 email: admin@cvsu.edu.ph

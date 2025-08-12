@@ -14,7 +14,11 @@ const salt = 10;
 const port = 3000;
 const app = express();
 
-// Initialize Google OAuth client
+// Google OAuth configuration
+if (!process.env.GOOGLE_CLIENT_ID) {
+    console.error('GOOGLE_CLIENT_ID environment variable is not set');
+    process.exit(1);
+}
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Middleware to verify JWT token
@@ -105,25 +109,54 @@ app.get("/bulletin", (req, res) => {
 
 
 // EBA STORE
-// CHECK AND LOGIN THE USER TO ACCESS EBA STORE
-app.post('/userlogin', (req, res) => {
-	const { email, password } = req.body;
+// CHECK AND LOGIN THE USER TO ACCESS EBA STORE - Google Auth Only
+app.post('/userlogin', async (req, res) => {
+    console.log('Login request body:', req.body);
+    const { googleToken } = req.body;
+    if (!googleToken) {
+        console.log('No token provided');
+        return res.status(400).json({ message: 'Google authentication is required' });
+    }
 
-	db.query('SELECT * FROM user_account WHERE Email_Address = ?', [email], (err, result) => {
-		if (err) throw err;
-		if (result.length === 0) return res.status(404).json({ message: "Email address doesn't exist" });
+    try {
+        console.log('Attempting to verify token with client ID:', process.env.GOOGLE_CLIENT_ID);
+        const ticket = await googleClient.verifyIdToken({
+            idToken: googleToken,
+            audience: process.env.GOOGLE_CLIENT_ID
+        });
+        
+        const { email } = ticket.getPayload();
+        
+        if (!email.endsWith('@cvsu.edu.ph')) {
+            return res.status(403).json({ message: 'Only @cvsu.edu.ph emails are allowed' });
+        }
 
-		const user = result[0];
-		
-		bcrypt.compare(password, user.Password, (err, isMatch) => {
-			if (err) throw err;
-			if (!isMatch) return res.status(400).json({ message: 'Incorrect password' });
-	  
-			const token = jwt.sign({ id: user.ID, username: user.Username, email: user.Email_Address }, 'secret_key', { expiresIn: '1h' });
-			res.json({ token });
-		})
-	})
-})
+        db.query('SELECT * FROM user_account WHERE Email_Address = ?', [email], (err, result) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({ message: 'Database error occurred' });
+            }
+            if (result.length === 0) {
+                return res.status(404).json({ message: "Please register first" });
+            }
+
+            const user = result[0];
+            const token = jwt.sign(
+                { 
+                    id: user.ID, 
+                    fullname: user.Full_Name,
+                    email: user.Email_Address 
+                }, 
+                process.env.JWT_SECRET, 
+                { expiresIn: '1h' }
+            );
+            res.json({ token });
+        });
+    } catch (err) {
+        console.error('Google token verification failed:', err);
+        res.status(400).json({ message: 'Invalid Google authentication' });
+    }
+});
 
 // User registration endpoint
 app.post("/usersignup", async (req, res) => {
@@ -524,7 +557,7 @@ app.post('/adminlogin', (req, res) => {
 			if (err) throw err;
 			if (!isMatch) return res.status(400).json({ message: 'Incorrect password' });
 	  
-			const token = jwt.sign({ id: user.ID, role: user.Role, image: user.Image, username: user.Username }, 'secret_key', { expiresIn: '1h' });
+			const token = jwt.sign({ id: user.ID, role: user.Role, image: user.Image, username: user.Username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 			res.json({ token });
 		})
 	})

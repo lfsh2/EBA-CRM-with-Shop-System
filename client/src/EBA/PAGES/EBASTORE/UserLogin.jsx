@@ -1,68 +1,48 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
 
 import './CSS/LandingStore.css';
 import './CSS/Preloader.css';
-import InputForm from '../../InputForm';
 
 const UserLogin = () => {
 	const navigateTo = useNavigate();
 	const [message, setMessage] = useState('');
 	const [loading, setLoading] = useState(false);
-	const [values, setValues] = useState({
-		email: '',
-		password: ''
-	});
 
-	const inputs = [
-		{
-			id: 1,
-			type: 'email',
-			name: 'email',
-			placeholder: 'Enter your email address',
-			errorMsg: 'Invalid email address', 
-			label: 'Email Address',
-			required: true
-		},
-		{
-			id: 2,
-			type: 'password',
-			name: 'password',
-			placeholder: 'Enter your password',
-			errorMsg: 'Incorrect password', 
-			label: 'Password',
-			required: true
-		}
-	]
-
-	const onChange = (e) => {
-		setValues({...values, [e.target.name]: e.target.value})
-	}
-
-	
-	const handleSubmit = async (e) => {
-		e.preventDefault();
+	const handleGoogleLogin = async (credentialResponse) => {
 		setLoading(true);
-	
 		try {
-			const response = await axios.post('http://localhost:3000/userlogin', values);
+			console.log('Google response:', credentialResponse);
+			
+			const decoded = jwtDecode(credentialResponse.credential);
+			console.log('Decoded token:', decoded);
+			
+			// Check if email is from cvsu.edu.ph domain
+			if (!decoded.email.endsWith('@cvsu.edu.ph')) {
+				setMessage('Please use your CvSU email account (@cvsu.edu.ph)');
+				setTimeout(() => setMessage(''), 3000);
+				setLoading(false);
+				return;
+			}
+
+			// Send token to backend
+			console.log('Sending token to backend...');
+			const response = await axios.post('http://localhost:3000/userlogin', {
+				googleToken: credentialResponse.credential
+			});
+
 			const { token } = response.data;
-
 			localStorage.setItem('token', token);
-
-			setTimeout(() => {
-				navigateTo('/ebastore');
-			}, 3000);
+			navigateTo('/ebastore');
 		} catch (err) {
+			const errMsg = err.response?.data?.message || 'Login failed';
+			setMessage(errMsg);
+			setTimeout(() => setMessage(''), 3000);
+		} finally {
 			setLoading(false);
-			setMessage('Invalid credentials');
-			setTimeout(() => {
-				setMessage('')
-			}, 3000);
 		}
 	};
 
@@ -85,32 +65,49 @@ const UserLogin = () => {
 	}
 
 	return (
-		<div className='login-form'>
-			<div className='form'>
-				<form onSubmit={handleSubmit}>
-					<div className='title'>
-						<a href='/' className='login-button'><FontAwesomeIcon icon={faArrowLeft} /></a>
-						<h2>LOGIN</h2>
-					</div>
+    <div className="cvsu-login-container">
+      <div className="cvsu-login-form">
+        <div className="cvsu-header">
+          <div
+            className="cvsu-logo"
+            onClick={() => navigateTo("/eba")}
+            style={{ cursor: "pointer" }}
+          >
+            <img src="/logo.png" alt="CvSU Logo" className="logo-diamond" />
+          </div>
 
-					{inputs.map((input) => (
-						<InputForm 
-							key={input.id} 
-							{...input} 
-							value={values[input.name]}
-							onChange={onChange} 
-						/>
-					))}
+          <div className="cvsu-title">
+            <h1>CAVITE STATE UNIVERSITY</h1>
+            <h2>TANZA CAMPUS</h2>
+            <h3>EBA SHOP PORTAL</h3>
+          </div>
+        </div>
 
-					<p>Don't have account? <a href="/usersignup">create account here.</a></p>
+        <div className="cvsu-form-content">
+          <div className="google-signin-description">
+            <p>Sign in with your CvSU Google Account</p>
+            <span>Only @cvsu.edu.ph accounts are allowed</span>
+          </div>
 
-					{message && <div className='messages'>{message}</div>}
+          <div className="custom-google-login">
+            <GoogleLogin
+              onSuccess={handleGoogleLogin}
+              onError={() => {
+                setMessage("Google Sign-In Failed");
+                setTimeout(() => setMessage(""), 3000);
+              }}
+              theme="outline"
+              size="large"
+              width="100%"
+              useOneTap={false}
+            />
+          </div>
 
-					<button type='submit'>Login</button>
-				</form>
-			</div>
-		</div>
-	)
+          {message && <div className="error-message">{message}</div>}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default UserLogin

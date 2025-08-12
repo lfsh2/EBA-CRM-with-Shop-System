@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
-
+import React from 'react';
 import './About.css'
 
 import Navbar from '../Navbar';
+import Footer from '../Footer';
 
 const AboutUs = () => {
 
@@ -11,138 +11,138 @@ const AboutUs = () => {
 			<Navbar />
 
 			<div className="header">
-            	<h1>ABOUT</h1>
-				<p>Meet our Capstone Developers</p>
+            	<h1>Meet the Developers</h1>
+				<p>Langya Delay</p>
 			</div>
 
-			<div className="members">
-				<div className="ar team">
-					<h2>AUGMENTED REALITY TEAM</h2>
-					<div className="card-block">
-						<div className="card">
-							<div className="img-block">
-								<img src='/developers/lee.png' />
-							</div>
-							<div className="text-block">
-								<h3 className="mem-name">Edishan Lee Tenorio</h3>
-								<p><i>"Lately I been, I been losing sleep"</i></p>
-							</div>
-						</div>
-						<div className="card">
-							<div className="img-block">
-								<img src='/developers/paulo.png' />
-							</div>
-							<div className="text-block">
-								<h3 className="mem-name">John Paulo Ramos</h3>
-								<p><i>"mas pipiliin kong ma deds kung buhay ko'y di fresh"</i></p>
-							</div>
-						</div>
-						<div className="card">
-							<div className="img-block">
-								<img src='/developers/wendell.png' />
-							</div>
-							<div className="text-block">
-								<h3 className="mem-name">Chris Wendell Flaviano</h3>
-								<p><i>"Everthing has its own beginning"</i></p>
-							</div>
-						</div>
-						<div className="card">
-							<div className="img-block">
-								<img src='/developers/louie.png' />
-							</div>
-							<div className="text-block">
-								<h3 className="mem-name">Louie Arceo</h3>
-								<p><i>"Hindi ka makakarating sa patutunguhan kung di ka marunong lumingon sa pinanggalingan"</i></p>
-							</div>
-						</div>
-						<div className="card">
-							<div className="img-block">
-								<img src='/developers/nino.png' />
-							</div>
-							<div className="text-block">
-								<h3 className="mem-name">Aerold Nino Bautista</h3>
-								<p><i>"Proseso bago Asenso"</i></p>
-							</div>
-						</div>
+			<div className="team-grid">
+				<div className="member-card">
+					<div className="member-image">
+						<img src='/developers/lee.png' alt="Edishan Lee Tenorio" />
+					</div>
+					<div className="member-info">
+						<h3 className="member-name">Edishan Lee Tenorio</h3>
+						<p className="member-quote">"Lately I been, I been losing sleep"</p>
 					</div>
 				</div>
 
-				<div className="modelling team">
-					<h2>3D MODELLING TEAM</h2>
-					<div className="card-block">
-						<div className="card">
-							<div className="img-block">
-								<img src='/developers/mykel.png' />
-							</div>
-							<div className="text-block">
-								<h3 className="mem-name">John Mykel Estoria</h3>
-								<p><i>"Do not boast of tomorrow, for you do not know what a day may bring forth"</i></p>
-							</div>
-						</div>
-						<div className="card">
-							<div className="img-block">
-								<img src='/developers/mar.png' />
-							</div>
-							<div className="text-block">
-								<h3 className="mem-name">Rency Mar Tabangay</h3>
-								<p><i>"If you want to buy things without looking at the price, work without looking at the clock"</i></p>
-							</div>
-						</div>
-						<div className="card">
-							<div className="img-block">
-								<img src='/developers/jv.png' />
-							</div>
-							<div className="text-block">
-								<h3 className="mem-name">JV Recierdo</h3>
-								<p><i>"A comfort zone is a beautiful place, but nothing ever grows there"</i></p>
-							</div>
-						</div>
+				<div className="member-card">
+					<div className="member-image">
+						<img src='/developers/paulo.png' alt="John Paulo Ramos" />
+					</div>
+					<div className="member-info">
+						<h3 className="member-name">John Paulo Ramos</h3>
+						<p className="member-quote">"mas pipiliin kong ma deds kung buhay ko'y di fresh"</p>
 					</div>
 				</div>
 
-				<div className="eba-bulletin team">
-				<h2>EBA BULLETIN TEAM</h2>
-					<div className="card-block">
-						<div className="card">
-							<div className="img-block">
-								<img src='/developers/blessel.png' />
-							</div>
-							<div className="text-block">
-								<h3 className="mem-name">Dhaliane Blessel Palenzuela</h3>
-								<p><i>"Programming isn't about what you know, it's about what you can figure out"</i></p>
-							</div>
-						</div>
-						<div className="card">
-							<div className="img-block">
-								<img src='/developers/joy.png' />
-							</div>
-							<div className="text-block">
-								<h3 className="mem-name">Mary Joy Hilab</h3>
-								<p><i>"Be your own kind of beauty"</i></p>
-							</div>
-						</div>
-						<div className="card">
-							<div className="img-block">
-								<img src='/developers/may.png' />
-							</div>
-							<div className="text-block">
-								<h3 className="mem-name">Maria May Montano</h3>
-								<p><i>"Life changes with every breath you take and every word you read"</i></p>
-							</div>
-						</div>
-						<div className="card">
-							<div className="img-block">
-								<img src='/developers/andrei.png' />
-							</div>
-							<div className="text-block">
-								<h3 className="mem-name">Marc Andrei Nisperos</h3>
-								<p><i>"Well done is better than well said"</i></p>
-							</div>
-						</div>
+				<div className="member-card">
+					<div className="member-image">
+						<img src='/developers/wendell.png' alt="Chris Wendell Flaviano" />
+					</div>
+					<div className="member-info">
+						<h3 className="member-name">Chris Wendell Flaviano</h3>
+						<p className="member-quote">"Everything has its own beginning, If there's a hole, there's a goal"</p>
 					</div>
 				</div>
+
+				<div className="member-card">
+					<div className="member-image">
+						<img src='/developers/andrei.png' alt="Marc Andrei Nisperos" />
+					</div>
+					<div className="member-info">
+						<h3 className="member-name">Marc Andrei Nisperos</h3>
+						<p className="member-quote">"Well done is better than well said"</p>
+					</div>
+				</div>
+
+				
+
+				<div className="member-card">
+					<div className="member-image">
+						<img src='/developers/nino.png' alt="Aerold Nino Bautista" />
+					</div>
+					<div className="member-info">
+						<h3 className="member-name">Aerold Nino Bautista</h3>
+						<p className="member-quote">"Proseso bago Asenso"</p>
+					</div>
+				</div>
+
+				<div className="member-card">
+					<div className="member-image">
+						<img src='/developers/mykel.png' alt="John Mykel Estoria" />
+					</div>
+					<div className="member-info">
+						<h3 className="member-name">John Mykel Estoria</h3>
+						<p className="member-quote">"Do not boast of tomorrow, for you do not know what a day may bring forth"</p>
+					</div>
+				</div>
+
+				<div className="member-card">
+					<div className="member-image">
+						<img src='/developers/mar.png' alt="Rency Mar Tabangay" />
+					</div>
+					<div className="member-info">
+						<h3 className="member-name">Rency Mar Tabangay</h3>
+						<p className="member-quote">"If you want to buy things without looking at the price, work without looking at the clock"</p>
+					</div>
+				</div>
+
+				<div className="member-card">
+					<div className="member-image">
+						<img src='/developers/jv.png' alt="JV Recierdo" />
+					</div>
+					<div className="member-info">
+						<h3 className="member-name">JV Recierdo</h3>
+						<p className="member-quote">"A comfort zone is a beautiful place, but nothing ever grows there"</p>
+					</div>
+				</div>
+
+				<div className="member-card">
+					<div className="member-image">
+						<img src='/developers/blessel.png' alt="Dhaliane Blessel Palenzuela" />
+					</div>
+					<div className="member-info">
+						<h3 className="member-name">Dhaliane Blessel Palenzuela</h3>
+						<p className="member-quote">"Programming isn't about what you know, it's about what you can figure out"</p>
+					</div>
+				</div>
+
+				<div className="member-card">
+					<div className="member-image">
+						<img src='/developers/joy.png' alt="Mary Joy Hilab" />
+					</div>
+					<div className="member-info">
+						<h3 className="member-name">Mary Joy Hilab</h3>
+						<p className="member-quote">"Be your own kind of beauty"</p>
+					</div>
+				</div>
+
+				<div className="member-card">
+					<div className="member-image">
+						<img src='/developers/may.png' alt="Maria May Montano" />
+					</div>
+					<div className="member-info">
+						<h3 className="member-name">Maria May Montano</h3>
+						<p className="member-quote">"Life changes with every breath you take and every word you read"</p>
+					</div>
+				</div>
+
+				<div className="member-card">
+					<div className="member-image">
+						<img src='/developers/louie.png' alt="Louie Arceo" />
+					</div>
+					<div className="member-info">
+						<h3 className="member-name">Louie Arceo</h3>
+						<p className="member-quote">"Hindi ka makakarating sa patutunguhan kung di ka marunong lumingon sa pinanggalingan"</p>
+					</div>
+				</div>
+
+				
 			</div>
+				<Footer />
         </div>
+		
     )
 }
 

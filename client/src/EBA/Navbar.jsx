@@ -33,6 +33,7 @@ const Navbar = () => {
 							<div className="about-dropdown">
 								<Link to='/abouteba'>Mission and Vision</Link>
 								<Link to="/aboutdeveloper">About the Developer</Link>
+
 							</div>
 						)}
 						<button onClick={toggleDropdown} className='toggle-btn'>

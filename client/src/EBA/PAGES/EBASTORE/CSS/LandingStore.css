@@ -1,199 +1,197 @@
-.landingStore {
+.cvsu-login-container {
 	width: 100%;
 	height: 100vh;
-	padding: 10px;
+	background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
 	display: flex;
-	justify-content: space-between;
+	justify-content: center;
 	align-items: center;
-	flex-direction: column;
-
-	img {
-		width: 50%;
-		height: 50vh;
-		margin: auto;
-		object-fit: contain;
-	}
-
-	.text {
-		width: 100%;
-		height: 30vh;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		flex-direction: column;
-
-		.title {
-			text-align: center;
-		}
-
-		a {
-			text-decoration: none;
-			width: 25%;
-			padding: 20px;
-			border-radius: 20px;
-			background: linear-gradient(to bottom, #31DF43, #369340);
-			text-align: center;
-			color: white;
-			font-weight: bold;
-			transition: all 500ms;
-		}
-	}
+	padding: 20px;
+	box-sizing: border-box;
+	position: relative;
+	overflow: hidden;
 }
 
-.messages {
+.cvsu-login-container::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: url('../../../../../public/cvsuback.jpg') center/cover;
+	opacity: 0.1;
+	z-index: 1;
+}
+
+.cvsu-login-form {
+	background: rgba(45, 55, 65, 0.95);
+	border-radius: 20px;
+	padding: 40px;
+	width: 100%;
+	max-width: 450px;
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	position: relative;
+	z-index: 2;
+}
+
+.cvsu-header {
 	text-align: center;
-	color: red;
+	margin-bottom: 40px;
 }
 
+.cvsu-logo {
+	margin-bottom: 20px;
+	display: flex;
+	justify-content: center;
+}
 
-@media screen and (max-width: 992px) {
-	.landingStore {
-		height: auto;
-		gap: 30px;
+.logo-diamond {
+	width: 80px;
+	height: 80px;
+	object-fit: contain;
+}
+.cvsu-title h1 {
+	color: white;
+	font-size: 20px;
+	font-weight: 700;
+	margin: 0 0 5px 0;
+	letter-spacing: 1px;
+}
 
-		.text {
-			height: auto;
-			gap: 20px;
+.cvsu-title h2 {
+	color: white;
+	font-size: 16px;
+	font-weight: 600;
+	margin: 0 0 5px 0;
+	letter-spacing: 0.5px;
+}
 
-			a {
-				width: 50%;
-			}
-		}
+.cvsu-title h3 {
+	color: #ffc107;
+	font-size: 14px;
+	font-weight: 600;
+	margin: 0;
+	letter-spacing: 2px;
+}
+
+.cvsu-form-content {
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+	align-items: center;
+}
+
+.google-signin-description {
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+.google-signin-description p {
+	color: white;
+	font-size: 16px;
+	font-weight: 600;
+	margin: 0 0 8px 0;
+}
+
+.google-signin-description span {
+	color: rgba(255, 255, 255, 0.8);
+	font-size: 13px;
+	font-style: italic;
+}
+
+.custom-google-login {
+	width: 100%;
+	position: relative;
+}
+
+.custom-google-login > div {
+	width: 100% !important;
+	display: flex !important;
+	justify-content: center !important;
+}
+
+.custom-google-login button {
+	width: 100% !important;
+	height: 55px !important;
+	border-radius: 12px !important;
+	border: 2px solid rgba(255, 255, 255, 0.2) !important;
+	background: rgba(255, 255, 255, 0.95) !important;
+	backdrop-filter: blur(10px) !important;
+	transition: all 0.3s ease !important;
+	font-size: 16px !important;
+	font-weight: 600 !important;
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	gap: 12px !important;
+}
+
+.custom-google-login button:hover {
+	background: rgba(255, 255, 255, 1) !important;
+	border-color: #28a745 !important;
+	transform: translateY(-2px) !important;
+	box-shadow: 0 12px 25px rgba(40, 167, 69, 0.2) !important;
+}
+
+.custom-google-login button:active {
+	transform: translateY(0) !important;
+}
+
+.custom-google-login button svg {
+	width: 24px !important;
+	height: 24px !important;
+}
+
+.error-message {
+	background: rgba(220, 53, 69, 0.2);
+	color: #ff6b7a;
+	padding: 12px;
+	border-radius: 8px;
+	text-align: center;
+	font-size: 14px;
+	border: 1px solid rgba(220, 53, 69, 0.3);
+	backdrop-filter: blur(5px);
+}
+
+@media screen and (max-width: 576px) {
+	.cvsu-login-form {
+		padding: 30px 20px;
+		margin: 10px;
 	}
-}
-
-:root {
-    --text: black;
-}
-
-.login-form {
-    width: 100%;
-    height: 100vh;
-    padding: 20px;
-	background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('cvsu.jpg');
-	background-position: center;
-	background-size: cover;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--text);
-    cursor: default;
 	
-    .title {
-        text-align: center;
-    }
-
-	.form {
-		width: 450px;
-		background: white;
-		border-radius: 20px;
-		
-		form {
-			width: 90%;
-			height: 100%;
-			margin: auto;
-			padding: 20px;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			flex-direction: column;
-			gap: 30px;
-		}
-		
-		.title {
-			width: 100%;
-			position: relative;
-
-			.login-button {
-				color: var(--text);
-				position: absolute;
-				top: 50%;
-				left: 0;
-				transform: translateY(-50%);
-			}
-		}
-
-		.input-group {
-			width: 100%;
-			padding-bottom: 10px;
-			display: flex;
-			flex-direction: column;
-			gap: 10px;
-			position: relative;
-		}
-
-		.input-block {
-			width: 100%;
-			display: flex;
-			flex-direction: column;
-			gap: 10px;
-
-			.group {
-				width: 100%;
-				position: relative;
-
-				input {
-					width: 100%;
-				}
-
-				.password-visible {
-					font-size: 1rem;
-					position: absolute;
-					top: 50%;
-					right: 8px;
-					transform: translateY(-50%);
-					cursor: pointer;
-				}
-			}
-		}
-		label, .group span{
-			font-size: 0.8rem;
-		}
-		input {
-			padding: 10px;
-			border-radius: 10px;
-			background: none;
-			border: 1px solid black;
-			outline: none;
-		}
-
-		.group a {
-			color: var(--text);
-			font-weight: 500;
-		}
-
-		button[type='submit'] {
-			width: 100%;
-			padding: 10px 40px;
-			border-radius: 10px;
-			background: #212529;
-			border: none;
-			color: white;
-			transition: all 500ms;
-			cursor: pointer;
-		}
-		button[type='submit']:hover {
-			background: #343a40;
-		}
-
-		.message {
-			padding: 10px 20px;
-			background: var(--bg-color);
-			box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-			border-radius: 10px;
-			position: absolute;
-			bottom: 30px;
-			left: 60%;
-			transform: translateX(-50%);
-			z-index: 99;
-		}
+	.cvsu-title h1 {
+		font-size: 18px;
+	}
+	
+	.cvsu-title h2 {
+		font-size: 14px;
+	}
+	
+	.cvsu-title h3 {
+		font-size: 12px;
+		letter-spacing: 1px;
+	}
+	
+	.input-field input {
+		padding: 12px 12px 12px 40px;
+		font-size: 14px;
+	}
+	
+	.login-btn {
+		padding: 12px;
+		font-size: 14px;
 	}
 }
 
-@media screen and (max-width: 992px) {
-	.login-form {
-		.groups {
-			display: none;
-		}
+@media screen and (max-width: 480px) {
+	.cvsu-login-container {
+		padding: 10px;
+	}
+	
+	.cvsu-login-form {
+		padding: 25px 15px;
 	}
 }

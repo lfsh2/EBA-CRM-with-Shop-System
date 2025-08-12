@@ -14,12 +14,12 @@ const EBA = () => {
 
 	const slides = [
 		{
-			image: 'ITEMS/Student_Uniform-Male.png',
+			image: 'ITEMS/f2.png',
 			title: 'Male Uniform',
 			description: "Trying on the campus uniform is made easy with the help of Augmented Reality, you can easily see how the uniform would look while you're wearing it, without the need to wear one physically."
 		},
 		{
-			image: 'ITEMS/Student_Uniform-Female.png',
+			image: 'ITEMS/f1.png',
 			title: 'Female Uniform',
 			description: "Trying on the campus uniform is made easy with the help of Augmented Reality, you can easily see how the uniform would look while you're wearing it, without the need to wear one physically."
 		},
@@ -49,60 +49,98 @@ const EBA = () => {
 	return (
 		<div className='eba'>
 			<Navbar />
-
-			{/* first section */}
-			<div className="first-section">
-				<div className="group">
-					<div className="text">
-						<div className="title">
-							<h2 className='highlight'>Augmented Reality <p>for</p></h2>
-							<h2>Virtual Clothing Try-on</h2>
-
-							<p className='description'>Trying out now shirt designs has never been this easy!</p>
+			
+			{/* Hero Section */}
+			<div className="hero-section">
+				<div className="hero-content">
+					<div className="hero-text">
+						<span className="award-badge">External Business and Affairs</span>
+						<h1>Virtual Clothing Try-on</h1>
+						<p>Experience the future of online shopping with our innovative virtual try-on system. See how uniforms and organizational shirts look on you instantly.</p>
+						<div className="hero-buttons">
+							<button className="order-now">Know Details</button>
+							<button className="explore-more">Explore more</button>
 						</div>
-
-						<div className="btns">
-							<a href="/"><FontAwesomeIcon icon={faUser} /> Learn More</a>
-						</div>
+						<span className="ergonomic-badge">Ergonomic design</span>
 					</div>
-
-					<div className="images">
-						<div className="card">
-							<img src='/ITEMS/Student_Uniform-Male.png' />
-						</div>
-						<div className="card">
-							<img src='ITEMS/Student_Uniform-Female.png' />
-						</div>
+					<div className="hero-image">
+						<img 
+							src="/ITEMS/heroeba.png" 
+							alt="Image shit" 
+							className="hero-img"
+						/>
+					</div>
+				</div>
+				<div className="hero-features">
+					<div className="feature">
+						<FontAwesomeIcon icon={faUser} />
+						<span>Smart Sizing</span>
+					</div>
+					<div className="feature">
+						<FontAwesomeIcon icon={faUser} />
+						<span>Real-time Preview</span>
+					</div>
+					<div className="feature">
+						<FontAwesomeIcon icon={faUser} />
+						<span>360° View</span>
+					</div>
+					<div className="feature">
+						<FontAwesomeIcon icon={faUser} />
+						<span>HD Quality</span>
 					</div>
 				</div>
 			</div>
+
+			{/* Rest of the content */}
 
 			{/* second page */}
-			<div className="second-section">
-				<h1><p>Augmented Reality</p> for Trying-On</h1>
-
-				<div className="carousel">
-					<div className="carousel-slide">
-						<div className="img-block">
-							<img src={slides[currentIndex].image} alt={`Slide ${currentIndex + 1}`} className="carousel-image" />
+				<div className="second-section">
+				<div className="section-header">
+					<h1>Drive your design to a new age</h1>
+				</div>
+				
+				<div className="content-container">
+					<div className="left-side">
+						<div className="image-container">
+							<img src={slides[currentIndex].image} alt={slides[currentIndex].title} className="carousel-image" />
 						</div>
-
-						<div className="carousel-content">
-							<div className="group">
-								<div className="text">
-									<h2>{slides[currentIndex].title}</h2>
-									<p>{slides[currentIndex].description}</p>
-								</div>
-
-								<div className="btns">
-									<button className="carousel-button1" onClick={goToPrevious}><FontAwesomeIcon icon={faChevronLeft} /></button>
-									<button className="carousel-button2" onClick={goToNext}><FontAwesomeIcon icon={faChevronRight} /></button>
-								</div>
+						<div className="uniform-name">{slides[currentIndex].title}</div>
+					</div>
+					
+					<div className="right-side">
+						<div className="info-cards">
+							<div className="info-card active">
+								<div className="card-number">0{currentIndex + 1}</div>
+								<h3>{slides[currentIndex].title}</h3>
+								<p>{slides[currentIndex].description}</p>
 							</div>
+							
+							{slides.map((slide, index) => {
+								if (index !== currentIndex) {
+									return (
+										<div key={index} className="info-card inactive" onClick={() => setCurrentIndex(index)}>
+											<div className="card-number">0{index + 1}</div>
+											<h3>{slide.title}</h3>
+											<p>{slide.description}</p>
+										</div>
+									);
+								}
+								return null;
+							})}
+						</div>
+						
+						<div className="navigation-controls">
+							<button className="nav-btn" onClick={goToPrevious}>
+								<FontAwesomeIcon icon={faChevronLeft} />
+							</button>
+							<button className="nav-btn" onClick={goToNext}>
+								<FontAwesomeIcon icon={faChevronRight} />
+							</button>
 						</div>
 					</div>
 				</div>
 			</div>
+
 
 			{/* third section */}
 			<div className="third-section">
