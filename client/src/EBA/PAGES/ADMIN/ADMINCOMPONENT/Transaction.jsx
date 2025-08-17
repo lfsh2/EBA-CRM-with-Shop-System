@@ -47,6 +47,7 @@ const Transaction = () => {
     const handleDetails = (transaction) => {
         setDetails(transaction);
         setFormData({ 
+            orderid: transaction.OrderID, 
             image: transaction.Image, 
             itemName: transaction.Item_Name, 
             variant: transaction.Variant, 
@@ -146,6 +147,7 @@ const Transaction = () => {
                             <tr>
                                 {table ? (
                                     <>
+                                        <th>Order Number</th>
                                         <th>Image</th>
                                         <th>Item Name</th>
                                         <th>Variant</th>
@@ -175,6 +177,7 @@ const Transaction = () => {
                                     <tr key={index}>
                                         {table ? (
                                             <>
+                                                <td>{transaction.OrderID}</td>
                                                 <td><img src={`http://localhost:3000/ITEMS/${transaction.Image}`} alt="" /></td>
                                                 <td>{transaction.Item_Name}</td>
                                                 <td>{transaction.Variant || '-'}</td>
@@ -209,6 +212,7 @@ const Transaction = () => {
                             </div>
 
                             <div className="order">
+                                <div className="detail-block"><label>Order Number:</label><p>#{formData.orderid}</p></div>
                                 <div className="detail-block"><label>Image:</label><div className="img-block"><img src={`http://localhost:3000/ITEMS/${formData.image}`} alt="" /></div></div>
                                 <div className="detail-block"><label>Item Name:</label><p>{formData.itemName}</p></div>
                                 <div className="detail-block"><label>Variant:</label><p>{formData.variant}</p></div>

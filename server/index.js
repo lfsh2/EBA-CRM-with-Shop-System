@@ -107,6 +107,31 @@ app.get("/bulletin", (req, res) => {
 	});
 });
 
+app.get('/search', (req, res) => {
+	const searchTerm = req.query.q || '';
+    const sql = `SELECT * FROM transaction WHERE Email_Address LIKE ? LIMIT 10`;
+    db.query(sql, [`%${searchTerm}%`], (err, results) => {
+		if (err) return res.status(500).json({ error: err });
+        res.json(results);
+    });
+});
+
+app.get('/searchtransactionsbyemail/:email', (req, res) => {
+    const email = req.params.email;
+    db.query(
+        'SELECT * FROM transaction WHERE Email_Address = ?',
+        [email],
+        (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Database error' });
+            }
+            res.json(results);
+        }
+    );
+});
+
+
 
 // EBA STORE
 // CHECK AND LOGIN THE USER TO ACCESS EBA STORE - Google Auth Only
@@ -284,8 +309,7 @@ app.post("/addOrderUniform", upload.single('transaction'), (req, res) => {
 		Variant = '',
 		Size = '',
 		Quantity,
-		Amount,
-		PhoneNumber
+		Amount	
 	} = req.body;
 
 	try {
@@ -325,8 +349,8 @@ app.post("/addOrderUniform", upload.single('transaction'), (req, res) => {
 			} else {
 				let insertQuery = `
 					INSERT INTO item_cart 
-					(User_ID, Category, Image, Item_Name, Variant, Size, Quantity, Amount, Phone_Number) 
-					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+					(User_ID, Category, Image, Item_Name, Variant, Size, Quantity, Amount) 
+					VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 				`;
 
 				let values = [
@@ -337,8 +361,7 @@ app.post("/addOrderUniform", upload.single('transaction'), (req, res) => {
 					Variant || '',
 					Size || '',
 					Quantity,
-					Amount,
-					PhoneNumber
+					Amount
 				];
 
 				db.query(insertQuery, values, (err, result) => {
@@ -412,133 +435,205 @@ app.post('/checkout', (req, res) => {
 
             const cartItems = results.filter(row => row.Item_Name !== null);
 
-			if (cartItems.length === 0) {
-				console.log("Your cart is empty");
-				return db.rollback(() => res.status(400).json({ error: "Your cart is empty" }));
-			}
+            if (cartItems.length === 0) {
+                console.log("Your cart is empty");
+                return db.rollback(() => res.status(400).json({ error: "Your cart is empty" }));
+            }
 
             const Pending = 'Pending';
 
-            const insertQuery = `
+            // First insert placeholder without OrderID to get insertId
+            const tempInsertQuery = `
                 INSERT INTO transaction 
-                (Image, Item_Name, Variant, Size, Quantity, Amount, Customer_Name, Email_Address, Phone_Number, Date, Status) 
+                (OrderID, Image, Item_Name, Variant, Size, Quantity, Amount, Customer_Name, Email_Address, Phone_Number, Date, Status) 
                 VALUES ?
             `;
 
+            // Temporarily put a placeholder for OrderID (will be updated after insertId is known)
             const values = cartItems.map(row => [
-				row.Image, row.Item_Name, row.Variant, row.Size, row.Quantity,
-				row.Amount * row.Quantity, row.Full_Name, row.Email_Address, row.Phone_Number,
-				row.Date, Pending
-			]);
+                null, // placeholder for OrderID
+                row.Image,
+                row.Item_Name,
+                row.Variant,
+                row.Size,
+                row.Quantity,
+                row.Amount * row.Quantity,
+                row.Full_Name,
+                row.Email_Address,
+                row.Phone_Number,
+                row.Date,
+                Pending
+            ]);
 
-            db.query(insertQuery, [values], async (err, insertResult) => {
+            db.query(tempInsertQuery, [values], async (err, insertResult) => {
                 if (err) {
                     console.error("Insert Error:", err);
                     return db.rollback(() => res.status(500).json({ error: "Insert failed" }));
                 }
 
-                const orderID = insertResult.insertId;
-                const currentDate = new Date();
-                const year = currentDate.getFullYear().toString().slice(-2);
-                const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-                const day = currentDate.getDate().toString().padStart(2, '0');
-                const formattedDate = `${month}-${day}-${year}`;
+                // Generate order ID now (YearNow + 0 + transactionNumber)
+                const orderID = `${new Date().getFullYear()}0${insertResult.insertId}`;
 
-                try {
-					const itemRowsHTML = cartItems.map(row => {
-						const variantDisplay = row.Variant?.trim() ? row.Variant : '';
-						const sizeDisplay = row.Size?.trim() ? row.Size : '';
-						const productDisplay = [row.Item_Name, variantDisplay, sizeDisplay]
-							.filter(part => part) 
-							.join(' - ');
-					
-						return `
-							<tr>
-								<td style="border: 1px solid gray; padding: 8px; text-align: center;">${productDisplay}</td>
-								<td style="border: 1px solid gray; padding: 8px; text-align: center;">₱${row.Amount} x ${row.Quantity} = ₱${row.Amount * row.Quantity}</td>
-							</tr>
-						`;
-					}).join('');
-					
-
-					const totalAmount = cartItems.reduce((sum, row) => sum + (row.Amount * row.Quantity), 0);
-					const user = cartItems[0];
-
-					const orderID = `${new Date().getFullYear()}0${insertResult.insertId}`;
-
-					const mailOptions = {
-						from: 'cvsutanzaeba@gmail.com',
-						to: user.Email_Address,
-						subject: 'Order Details',
-						html: `
-							<header style='height: 150px; background: #c1ff72; display: flex; flex-direction: column; gap: 10px;'>
-								<img src="https://res.cloudinary.com/dfmnlcvbe/image/upload/v1744102780/logo_qy0g8a.png" style='width: 80px; height: 80px;'/>
-								<h2>External Business and<br>Affairs</h2>
-							</header>
-
-							<br>
-
-							<h3>Thank you for your order!</h3>
-							<p>${user.Full_Name}</p>
-							<p>Your order was received! We're working to get it processed and ready to claim.</p>
-
-							<br>
-
-							<div style='display: flex; align-items: center;'>
-								<div style="margin-right: 30px;">
-									<p>Order Number:</p>
-									<span>#${orderID}</span>
-								</div>
-								<div>
-									<p>Order Date:</p>
-									<span>${formattedDate}</span>
-								</div>
-							</div>
-
-							<br>
-
-							<table style="border: 1px solid gray; border-collapse: collapse; width: 100%; text-align: left;">
-								<tr>
-									<th style="border: 1px solid gray; padding: 8px; text-align: center;">PRODUCT</th>
-									<th style="border: 1px solid gray; padding: 8px; text-align: center;">PRICE</th>
-								</tr>
-								${itemRowsHTML}
-								<tr>
-									<td style="border: 1px solid gray; padding: 8px; text-align: center;"></td>
-									<td style="border: 1px solid gray; padding: 8px; text-align: center;"><strong>Total: P${totalAmount}</strong></td>
-								</tr>
-							</table>
-
-							<p>Thank you for your purchase!</p>
-							<p>Cavite State University - Tanza Campus</p>
-						`
-					};
-
-					await transporter.sendMail(mailOptions);
-
-                    db.query("DELETE FROM item_cart WHERE User_ID = ?", [userId], (err) => {
+                // Update all inserted rows with the generated order ID
+                db.query(
+                    `UPDATE transaction SET OrderID = ? WHERE id >= ? AND id < ?`,
+                    [orderID, insertResult.insertId, insertResult.insertId + cartItems.length],
+                    async (err) => {
                         if (err) {
-                            console.error("Cart Clear Error:", err);
-                            return db.rollback(() => res.status(500).json({ error: "Failed to clear cart" }));
+                            console.error("OrderID Update Error:", err);
+                            return db.rollback(() => res.status(500).json({ error: "OrderID update failed" }));
                         }
 
-                        db.commit((err) => {
-                            if (err) {
-                                console.error("Commit Error:", err);
-                                return db.rollback(() => res.status(500).json({ error: "Transaction commit failed" }));
-                            }
+                        const currentDate = new Date();
+                        const year = currentDate.getFullYear().toString().slice(-2);
+                        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+                        const day = currentDate.getDate().toString().padStart(2, '0');
+                        const formattedDate = `${month}-${day}-${year}`;
 
-                            res.json({ Status: "Success" });
-                        });
-                    });
-                } catch (emailError) {
-                    console.error("Email Error:", emailError);
-                    return db.rollback(() => res.status(500).json({ error: "Email sending failed" }));
-                }
+                        try {
+                            const itemRowsHTML = cartItems.map(row => {
+                                const variantDisplay = row.Variant?.trim() ? row.Variant : '';
+                                const sizeDisplay = row.Size?.trim() ? row.Size : '';
+                                const productDisplay = [row.Item_Name, variantDisplay, sizeDisplay]
+                                    .filter(part => part)
+                                    .join(' - ');
+
+                                return `
+                                    <tr>
+                                        <td style="border: 1px solid gray; padding: 8px; text-align: center;">${productDisplay}</td>
+                                        <td style="border: 1px solid gray; padding: 8px; text-align: center;">₱${row.Amount} x ${row.Quantity} = ₱${row.Amount * row.Quantity}</td>
+                                    </tr>
+                                `;
+                            }).join('');
+
+                            const totalAmount = cartItems.reduce((sum, row) => sum + (row.Amount * row.Quantity), 0);
+                            const user = cartItems[0];
+
+                            const mailOptions = {
+                                from: 'cvsutanzaeba@gmail.com',
+                                to: user.Email_Address,
+                                subject: 'Order Details',
+                                html: `
+                                    <header style='height: 150px; background: #c1ff72; display: flex; flex-direction: column; gap: 10px;'>
+                                        <img src="https://res.cloudinary.com/dfmnlcvbe/image/upload/v1744102780/logo_qy0g8a.png" style='width: 80px; height: 80px;'/>
+                                        <h2>External Business and<br>Affairs</h2>
+                                    </header>
+
+                                    <br>
+
+                                    <h3>Thank you for your order!</h3>
+                                    <p>${user.Full_Name}</p>
+                                    <p>Your order was received! We're working to get it processed and ready to claim.</p>
+
+                                    <br>
+
+                                    <div style='display: flex; align-items: center;'>
+                                        <div style="margin-right: 30px;">
+                                            <p>Order Number:</p>
+                                            <span>#${orderID}</span>
+                                        </div>
+                                        <div>
+                                            <p>Order Date:</p>
+                                            <span>${formattedDate}</span>
+                                        </div>
+                                    </div>
+
+                                    <br>
+
+                                    <table style="border: 1px solid gray; border-collapse: collapse; width: 100%; text-align: left;">
+                                        <tr>
+                                            <th style="border: 1px solid gray; padding: 8px; text-align: center;">PRODUCT</th>
+                                            <th style="border: 1px solid gray; padding: 8px; text-align: center;">PRICE</th>
+                                        </tr>
+                                        ${itemRowsHTML}
+                                        <tr>
+                                            <td style="border: 1px solid gray; padding: 8px; text-align: center;"></td>
+                                            <td style="border: 1px solid gray; padding: 8px; text-align: center;"><strong>Total: P${totalAmount}</strong></td>
+                                        </tr>
+                                    </table>
+
+                                    <p>Thank you for your purchase!</p>
+                                    <p>Cavite State University - Tanza Campus</p>
+                                `
+                            };
+
+                            await transporter.sendMail(mailOptions);
+
+                            db.query("DELETE FROM item_cart WHERE User_ID = ?", [userId], (err) => {
+                                if (err) {
+                                    console.error("Cart Clear Error:", err);
+                                    return db.rollback(() => res.status(500).json({ error: "Failed to clear cart" }));
+                                }
+
+                                db.commit((err) => {
+                                    if (err) {
+                                        console.error("Commit Error:", err);
+                                        return db.rollback(() => res.status(500).json({ error: "Transaction commit failed" }));
+                                    }
+
+                                    res.json({ Status: "Success" });
+                                });
+                            });
+                        } catch (emailError) {
+                            console.error("Email Error:", emailError);
+                            return db.rollback(() => res.status(500).json({ error: "Email sending failed" }));
+                        }
+                    }
+                );
             });
         });
     });
 });
+app.post("/requestCancelOrder", (req, res) => {
+    const { email, orderId } = req.body;
+
+    // Generate a verification token
+    const token = jwt.sign({ email, orderId }, "yourSecretKey", { expiresIn: "1h" });
+
+    const cancelLink = `http://localhost:3000/verifyCancelOrder/${token}`;
+
+    const mailOptions = {
+        from: "your_email@gmail.com",
+        to: email,
+        subject: "Order Cancellation Verification",
+        html: `
+            <p>We received a request to cancel your order <strong>${orderId}</strong>.</p>
+            <p>If this was you, please confirm by clicking the link below:</p>
+            <a href="${cancelLink}">Confirm Cancellation</a>
+        `
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: "Failed to send email" });
+        }
+        res.json({ message: "Verification email sent" });
+    });
+});
+app.get("/verifyCancelOrder/:token", (req, res) => {
+    const { token } = req.params;
+
+    jwt.verify(token, "yourSecretKey", (err, decoded) => {
+        if (err) return res.status(400).send("Invalid or expired token.");
+
+        const { email, orderId } = decoded;
+
+        // Update DB to set status to "Cancelled"
+        db.query("UPDATE transaction SET status = 'Cancelled' WHERE OrderID = ? AND Email_Address = ?", 
+            [orderId, email], 
+            (err) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send("Failed to cancel order.");
+                }
+                res.send("Your order has been successfully cancelled.");
+            }
+        );
+    });
+});
+
+
 
 
 

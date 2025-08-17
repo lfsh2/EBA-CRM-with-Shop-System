@@ -6,6 +6,8 @@ import { jwtDecode } from 'jwt-decode';
 
 import './CSS/LandingStore.css';
 import './CSS/Preloader.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 const UserLogin = () => {
 	const navigateTo = useNavigate();
@@ -74,6 +76,7 @@ const UserLogin = () => {
             style={{ cursor: "pointer" }}
           >
             <img src="/logo.png" alt="CvSU Logo" className="logo-diamond" />
+			<FontAwesomeIcon icon={faTimes} className='icon' />
           </div>
 
           <div className="cvsu-title">
@@ -87,6 +90,8 @@ const UserLogin = () => {
           <div className="google-signin-description">
             <p>Sign in with your CvSU Google Account</p>
             <span>Only @cvsu.edu.ph accounts are allowed</span>
+			<br /><br />
+			<small>Don't have account? <a href="/usersignup">Click here</a> to register.</small>
           </div>
 
           <div className="custom-google-login">

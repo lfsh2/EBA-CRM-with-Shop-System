@@ -12,7 +12,6 @@ const AboutUs = () => {
 
 			<div className="header">
             	<h1>Meet the Developers</h1>
-				<p>Langya Delay</p>
 			</div>
 
 			<div className="team-grid">

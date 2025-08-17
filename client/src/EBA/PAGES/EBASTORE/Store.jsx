@@ -54,7 +54,7 @@ const Store = () => {
 		}
 	
 		const decodedToken = JSON.parse(atob(token.split('.')[1]));
-		setFullName(decodedToken.username);
+		setFullName(decodedToken.fullname);
 		setEmailAddress(decodedToken.email);
 		setUserId(decodedToken.id);
 
@@ -175,7 +175,6 @@ const Store = () => {
 
 	const handleBack = () => {
 		setOpenModal(null)
-		setFormHide(null)
 		setImage()
 		setItemName('')
 		setAmount('')

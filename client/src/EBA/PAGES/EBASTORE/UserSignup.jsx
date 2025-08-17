@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 
@@ -116,7 +116,7 @@ const UserSignin = () => {
 						<div className="cube"></div>
 						<div className="cube"></div>
 						<div className="cube"></div>
-					</div>
+					</div>x``
 					<div className="preloader-text">Signing Up...</div>
 				</div>
 			</div>
@@ -124,41 +124,43 @@ const UserSignin = () => {
 	}
 
 	return (
-		<div className='login-form'>
-			<div className='form'>
-				<form onSubmit={handleSubmit}>
-					<div className='title'>
-						<a href='/' className='login-button'><FontAwesomeIcon icon={faArrowLeft} /></a>
-						<h2>Sign Up</h2>
+		<div className='cvsu-login-container'>
+			<div className='cvsu-login-form'>
+				<div className="cvsu-header">
+					<div
+						className="cvsu-logo"
+						onClick={() => navigateTo("/eba")}
+						style={{ cursor: "pointer" }}
+					>
+						<img src="/logo.png" alt="CvSU Logo" className="logo-diamond" />
+						<FontAwesomeIcon icon={faTimes} className='icon' />
 					</div>
 
-					{inputs.map((input) => (
-						<InputForm
-							key={input.id}
-							{...input}
-							value={values[input.name]}
-							onChange={onChange}
+					<div className="cvsu-title">
+						<h1>CAVITE STATE UNIVERSITY</h1>
+						<h2>TANZA CAMPUS</h2>
+						<h3>EBA SHOP PORTAL</h3>
+					</div>
+				</div>
+
+				
+				<div className="cvsu-form-content">
+					<div className="google-signin-description">
+						<p>Sign up with your CvSU Google Account</p>
+						<span>Only @cvsu.edu.ph accounts are allowed</span>
+						<br /><br />
+						<small>Already have account? <a href="/userlogin">Click here</a> to register.</small>
+					</div>
+
+					<div style={{ textAlign: 'center' }}>
+						<GoogleLogin
+							onSuccess={handleGoogleSuccess}
+							onError={() => {
+								setMessage('Google Sign-In Failed');
+								setTimeout(() => setMessage(''), 3000);
+							}}
 						/>
-					))}
-
-					<p>Already have an account? <a href="/userlogin">Log in here.</a></p>
-
-					{message && <div className='messages'>{message}</div>}
-
-					<button type='submit'>Sign Up</button>
-				</form>
-
-				<hr style={{ margin: '20px 0' }} />
-
-				<div style={{ textAlign: 'center' }}>
-					<h4>Or Sign Up with Google</h4>
-					<GoogleLogin
-						onSuccess={handleGoogleSuccess}
-						onError={() => {
-							setMessage('Google Sign-In Failed');
-							setTimeout(() => setMessage(''), 3000);
-						}}
-					/>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -342,6 +342,163 @@
 			}
 		}
 	}
+
+	.check-status-modal {
+		width: 100%;
+		height: 100vh;
+		background: rgba(0, 0, 0, 0.5);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 9;
+
+		.check-status {
+			width: 600px;
+			height: 90vh;
+			padding: 20px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			flex-direction: column;
+			background: white;
+			border-radius: 10px;
+		}
+
+		form {
+			width: 100%;
+			display: flex;
+			justify-content: center;
+			flex-direction: column;
+			gap: 5px;
+			text-align: center;
+			position: relative;
+
+			button {
+				position: absolute;
+				top: 5px;
+				right: 10px;
+				font-size: 1rem;
+				background: none;
+				border: none;
+				cursor: pointer;
+			}
+
+			.input-block {
+				width: 100%;
+				margin-top: 20px;
+				position: relative;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+
+				label {
+					color: #4CA04F;
+				}
+
+				input {
+					width: 70%;
+					padding: 10px;
+					border: 1px solid black;
+					border-radius: 5px;
+				}
+
+				.icon {
+					position: absolute;
+					top: 50%;
+					right: 8px;
+					transform: translateY(-50%);
+				}
+			}
+
+			.search-result {
+				width: 70%;
+				border-radius: 5px;
+				border: 1px solid black;
+				display: flex;
+				align-items: end;
+				flex-direction: column;
+				gap: 5px;
+				position: absolute;
+				top: 90%;
+				right: 0;
+				z-index: 9;
+				
+				p {
+					width: 100%;
+					padding: 5px;
+					flex-grow: 1;
+					text-align: left;
+					cursor: pointer;
+				}
+			}
+		}
+
+		.result-container {
+			width: 100%;
+			height: 500px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			flex-direction: column;
+
+			.result-block, .result {
+				width: 100%;
+				text-align: center;
+
+				h3 {
+					padding: 20px 0;
+				}
+			}
+
+			.result-block {
+				max-height: 450px;
+				overflow: auto;
+			}
+
+			.transaction {
+				padding: 10px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				flex-direction: column;
+				gap: 10px;
+				border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+				border-top: 1px solid rgba(0, 0, 0, 0.5);
+			}
+
+			.result {
+				display: flex;
+				align-items: center;
+				gap: 5px;
+
+				p {
+					width: 30%;
+					display: flex;
+					align-items: center;
+				}
+
+				span {
+					padding: 5px;
+					border: 1px solid black;
+					border-radius: 5px;
+					flex-grow: 1;
+					text-align: left;
+				}
+			}
+
+			button {
+				padding: 10px 20px;
+				background: red;
+				color: white;
+				border: none;
+				border-radius: 10px;
+				cursor: pointer;
+			}
+		}
+	}
 }
 @media (max-width: 992px) {
 	.navbar {
