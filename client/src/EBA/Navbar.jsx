@@ -1,174 +1,197 @@
-import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars, faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
 
 const Navbar = () => {
-	const [isOpen, setIsOpen] = useState(false);
-	const [isAbout, setIsAbout] = useState(false);
-	const [openStatus, setOpenStatus] = useState(false);
-    const [query, setQuery] = useState('');
-    const [results, setResults] = useState([]);
+	const isActive = (path) => location.pathname === path;
 
-	const toggleDropdown = () => {
-		setIsOpen(!isOpen);
-	};
 
-	const toggleAbout = () => {
-		setIsAbout(!isAbout);
-	};
+  const [isOpen, setIsOpen] = useState(false);
+  const [isAbout, setIsAbout] = useState(false);
+  const [openStatus, setOpenStatus] = useState(false);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
 
-	const toggleCheckStatus = () => {
-		setOpenStatus(!openStatus);
-	};
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
 
-    useEffect(() => {
-        if (query.trim() === '') {
-            setResults([]);
-            return;
-        }
+  const toggleAbout = () => {
+    setIsAbout(!isAbout);
+  };
 
-        const delayDebounce = setTimeout(() => {
-            axios.get(`http://localhost:3000/search?q=${query}`)
-                .then(res => setResults(res.data))
-                .catch(err => console.error(err));
-        }, 300);
+  const toggleCheckStatus = () => {
+    setOpenStatus(!openStatus);
+  };
 
-        return () => clearTimeout(delayDebounce);
-    }, [query]);
+  useEffect(() => {
+    if (query.trim() === "") {
+      setResults([]);
+      return;
+    }
 
-    const [selectedTransactions, setSelectedTransactions] = useState([]); // store multiple transactions
+    const delayDebounce = setTimeout(() => {
+      axios
+        .get(`http://localhost:3000/search?q=${query}`)
+        .then((res) => setResults(res.data))
+        .catch((err) => console.error(err));
+    }, 300);
 
-	const handleItemClick = (email) => {
-		console.log('Clicked Email:', email);
+    return () => clearTimeout(delayDebounce);
+  }, [query]);
 
-		axios.get(`http://localhost:3000/searchtransactionsbyemail/${email}`)
-			.then(res => setSelectedTransactions(res.data))
-			.catch(err => console.error('Error fetching transactions:', err));
-	};
+  const [selectedTransactions, setSelectedTransactions] = useState([]); // store multiple transactions
 
-	const handleCancelOrder = (email, orderId) => {
-		if (!window.confirm("Are you sure you want to cancel this order?")) return;
+  const handleItemClick = (email) => {
+    console.log("Clicked Email:", email);
 
-		axios.post("http://localhost:3000/requestCancelOrder", { email, orderId })
-			.then(() => {
-				alert("A cancellation verification email has been sent to your address.");
-			})
-			.catch(err => console.error("Error sending cancel request:", err));
-	};
+    axios
+      .get(`http://localhost:3000/searchtransactionsbyemail/${email}`)
+      .then((res) => setSelectedTransactions(res.data))
+      .catch((err) => console.error("Error fetching transactions:", err));
+  };
 
-	return (
-		<div className="navbar">
-			<nav>
-				<div className='nav-links'>
-					<div className="logo">
-						<img src='/logo.png' />
-						<span> External Business Affairs</span>
-					</div>
+  const handleCancelOrder = (email, orderId) => {
+    if (!window.confirm("Are you sure you want to cancel this order?")) return;
 
-					<ul className="links">
-						<button onClick={toggleCheckStatus}>Check Status</button>
-						<Link to='/'>Home</Link>
-						<Link to='/userlogin'>Store</Link>
-						<button onClick={toggleAbout}>About</button>
-						{isAbout && (
-							<div className="about-dropdown">
-								<Link to='/abouteba'>Mission and Vision</Link>
-								<Link to="/aboutdeveloper">About the Developer</Link>
-							</div>
-						)}
-						<button onClick={toggleDropdown} className='toggle-btn'>
-							<FontAwesomeIcon icon={faBars} />
-						</button>
-					</ul>
-				</div>
+    axios
+      .post("http://localhost:3000/requestCancelOrder", { email, orderId })
+      .then(() => {
+        alert(
+          "A cancellation verification email has been sent to your address."
+        );
+      })
+      .catch((err) => console.error("Error sending cancel request:", err));
+  };
 
-				{openStatus && (
-					<div className="check-status-modal">
-						<div className="check-status">
-							<form action="">
-								<h2>Check Status</h2>
-								<small>Please input your CvSU email address</small>
-								<button onClick={toggleCheckStatus}><FontAwesomeIcon icon={faTimes} /></button>
+  return (
+    <div className="navbar">
+      <nav>
+        <div className="nav-links">
+          <div className="logo">
+            <img src="/logo.png" />
+            <p>
+              <span>Cavite State University - Tanza</span> <br /> External
+              Business and Affairs
+            </p>
+          </div>
 
-								<div className="input-block">
-									<label htmlFor="studentNumber">CvSU Email Address:</label>
-									<input 
-										type='text' 
-										name='search' 
-										id='search' 
-										value={query}
-										onChange={(e) => setQuery(e.target.value)}
-										placeholder='CvSU email address' 
-									/>
-									<FontAwesomeIcon icon={faSearch} className='icon' />
-								</div>
+          <ul className="links">
+            <Link to="/eba" className={isActive("/eba") ? "active" : ""}>
+              Home
+            </Link>
+            <Link to="/userlogin">Store</Link>
+            <button onClick={toggleAbout}>About</button>
+            {isAbout && (
+              <div className="about-dropdown">
+                <Link to="/abouteba">Mission and Vision</Link>
+                <Link to="/aboutdeveloper">About the Developer</Link>
+              </div>
+            )}
+            <button onClick={toggleDropdown} className="toggle-btn">
+              <FontAwesomeIcon icon={faBars} />
+            </button>
+            <button onClick={toggleCheckStatus}>Check Status</button>
+          </ul>
+        </div>
 
-								{results.map(student => (
-									<div key={student.ID} className="search-result">
-										<p onClick={() => handleItemClick(student.Email_Address)}>
-											{student.Customer_Name}
-										</p>
-									</div>
-								))}
-							</form>
+        {openStatus && (
+          <div className="check-status-modal">
+            <div className="check-status">
+              <form action="">
+                <h2>Check Status</h2>
+                <small>Please input your CvSU email address</small>
+                <button onClick={toggleCheckStatus}>
+                  <FontAwesomeIcon icon={faTimes} />
+                </button>
 
-							<div className="result-container">
-								<div className="result-block">
-									<h3>Order Details</h3>
+                <div className="input-block">
+                  <label htmlFor="studentNumber">CvSU Email Address:</label>
+                  <input
+                    type="text"
+                    name="search"
+                    id="search"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="CvSU email address"
+                  />
+                  <FontAwesomeIcon icon={faSearch} className="icon" />
+                </div>
 
-									{selectedTransactions.length > 0 ? (
-										selectedTransactions.map((transaction, index) => (
-											<div key={index} className="transaction">
-												<div className="result">
-													<p>Name:</p>
-													<span>{transaction.Customer_Name}</span>
-												</div>
+                {results.map((student) => (
+                  <div key={student.ID} className="search-result">
+                    <p onClick={() => handleItemClick(student.Email_Address)}>
+                      {student.Customer_Name}
+                    </p>
+                  </div>
+                ))}
+              </form>
 
-												<div className="result">
-													<p>Order #:</p>
-													<span>{transaction.OrderID}</span>
-												</div>
+              <div className="result-container">
+                <div className="result-block">
+                  <h3>Order Details</h3>
 
-												<div className="result">
-													<p>Items:</p>
-													<span>{transaction.Item_Name}</span>
-												</div>
-												
-												<button onClick={() => handleCancelOrder(transaction.Email_Address, transaction.OrderID)}>Cancel Order</button>
-											</div>
-										))
-									) : (
-										<p>No transactions found.</p>
-									)}
-								</div>
+                  {selectedTransactions.length > 0 ? (
+                    selectedTransactions.map((transaction, index) => (
+                      <div key={index} className="transaction">
+                        <div className="result">
+                          <p>Name:</p>
+                          <span>{transaction.Customer_Name}</span>
+                        </div>
 
-							</div>
-						</div>
-					</div>
-				)}
+                        <div className="result">
+                          <p>Order #:</p>
+                          <span>{transaction.OrderID}</span>
+                        </div>
 
-				<div className="dropdown">
-					{isOpen && (
-					<ul className="dropdown-menu">
-						<Link to="/">Home</Link>
-						<Link to="/userlogin">Store</Link>
-						<button onClick={toggleAbout}>About</button>
-						{isAbout && (
-							<div className="about-dropdown">
-								<Link to="/abouteba">Mission and Vision</Link>
-								<Link to="/aboutdeveloper">About the Developer</Link>
-							</div>
-						)}
-						<button onClick={toggleCheckStatus}>Check Status</button>
-					</ul>
-					)}
-				</div>
-			</nav>
-		</div>
-	)
-}
+                        <div className="result">
+                          <p>Items:</p>
+                          <span>{transaction.Item_Name}</span>
+                        </div>
 
-export default Navbar
+                        <button
+                          onClick={() =>
+                            handleCancelOrder(
+                              transaction.Email_Address,
+                              transaction.OrderID
+                            )
+                          }
+                        >
+                          Cancel Order
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No transactions found.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="dropdown">
+          {isOpen && (
+            <ul className="dropdown-menu">
+              <Link to="/">Home</Link>
+              <Link to="/userlogin">Store</Link>
+              <button onClick={toggleAbout}>About</button>
+              {isAbout && (
+                <div className="about-dropdown">
+                  <Link to="/abouteba">Mission and Vision</Link>
+                  <Link to="/aboutdeveloper">About the Developer</Link>
+                </div>
+              )}
+              <button onClick={toggleCheckStatus}>Check Status</button>
+            </ul>
+          )}
+        </div>
+      </nav>
+    </div>
+  );
+};
+
+export default Navbar;

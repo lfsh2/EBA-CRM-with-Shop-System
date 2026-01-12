@@ -7,9 +7,9 @@ const Sidebar = ({ onMenuClick, isOpen, handleLogout }) => {
     const [activeButton, setActiveButton] = useState('Dashboard');
 	const [settingOpen, setSettingOpen] = useState(false);
 
-    const handleButtonClick = (componentName) => {
-        setActiveButton(componentName);
-        onMenuClick(componentName);
+	const handleButtonClick = (componentName) => {
+		setActiveButton(componentName);
+		onMenuClick(componentName);
 	};
 
     return (

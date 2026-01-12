@@ -1,13 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+  --primary-text: #2E2E2E;
+  --secondary-text: #4CA04F;
+  --primary-bg: #F5F5F5;
+  --secondary-bg: #EEFBEE;
+  --primary-btn: #8EE13C;
+  --accent: #70BD24;
+  --error: #FF2424;
+  --success: #00D000;
+}
+
 
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: Quicksand;
+  font-family: Montserrat;
+  color: var(--primary-text);
+  font-size: 1rem;
 }
 
 html, body {
-  background: white;
+  background: var(--primary-bg);
   scroll-behavior: smooth;
 }
